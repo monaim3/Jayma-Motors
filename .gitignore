@@ -1,0 +1,7 @@
+# Each app has its own .gitignore (backend/, frontend/). These cover the repo root.
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+.playwright-mcp/
+*.log

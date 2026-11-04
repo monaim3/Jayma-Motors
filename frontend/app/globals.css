@@ -1,0 +1,105 @@
+@import "tailwindcss";
+
+/*
+ * Design tokens — Step 5 §2 (docs/05-ui-ux-design.md).
+ * Brand colours are sampled from the Jayma Motors logo.
+ */
+@theme {
+  /* Built from the logo "M" red (#C42927, measured from docs/assets/brand/logo-source.jpg), same hue throughout. */
+  --color-brand-50: #fcebea;
+  --color-brand-100: #f8d5d4;
+  --color-brand-500: #e0403e; /* lighter tint for red text on dark backgrounds (4.5:1 on ink-950) */
+  --color-brand-600: #c42927; /* exact logo red */
+  --color-brand-700: #a2221f;
+  --color-brand-900: #5d1514;
+
+  --color-logo-black: #1f1f1f;
+  --color-ink-900: #18181b;
+  --color-ink-950: #0e0e10;
+
+  --color-success-50: #f0fdf4;
+  --color-success-600: #16a34a;
+  --color-success-700: #15803d;
+  --color-warning-50: #fffbeb;
+  --color-warning-500: #f59e0b;
+  --color-warning-700: #b45309;
+  --color-info-50: #eff6ff;
+  --color-info-600: #2563eb;
+  --color-info-700: #1d4ed8;
+  --color-violet-50: #f5f3ff;
+  --color-violet-600: #7c3aed;
+  --color-danger-50: #fef2f2;
+  --color-danger-600: #dc2626;
+  --color-danger-700: #b91c1c;
+
+  --radius-control: 0.5rem;
+  --radius-card: 0.75rem;
+
+  --container-site: 80rem;
+}
+
+@keyframes hero-fade {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@theme inline {
+  /* Brands marquee: the track holds two identical halves, so -50% loops seamlessly. */
+  --animate-marquee: marquee 60s linear infinite;
+
+  @keyframes marquee {
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  --font-sans: var(--font-nunito-sans), ui-sans-serif, system-ui, sans-serif;
+  /* Small/UI headings (cards, footer, dashboards) stay in the sans for readability. */
+  --font-heading: var(--font-nunito-sans), ui-sans-serif, system-ui, sans-serif;
+  /* Big marketing headings: `font-display font-medium`. */
+  --font-display: var(--font-bodoni-moda), Georgia, "Times New Roman", serif;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    /* In-page jumps land below the fixed header. */
+    scroll-padding-top: 6rem;
+  }
+
+  body {
+    @apply bg-white font-sans text-ink-900 antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-heading text-ink-950;
+  }
+
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-brand-600;
+  }
+
+  [lang="bn"] {
+    font-family: "Noto Sans Bengali", var(--font-sans);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
