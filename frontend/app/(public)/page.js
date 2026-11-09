@@ -1,5 +1,8 @@
 import { AppointmentSection } from "@/components/features/home/AppointmentSection";
+import { BeforeAfterSection } from "@/components/features/home/BeforeAfterSection";
 import { BrandsMarquee } from "@/components/features/home/BrandsMarquee";
+import { ContactBand } from "@/components/features/home/ContactBand";
+import { FaqSection } from "@/components/features/home/FaqSection";
 import { HowItWorksSection } from "@/components/features/home/HowItWorksSection";
 import { ReviewsSection } from "@/components/features/home/ReviewsSection";
 import { ScrollBuiltHero } from "@/components/features/home/ScrollBuiltHero";
@@ -12,7 +15,8 @@ import { WhyChooseSection } from "@/components/features/home/WhyChooseSection";
 /*
  * Home page (Step 5 §6.1), built a few sections at a time.
  * Done: hero, appointment form, numbers band, services, how it works,
- * why choose, workshop video, Shell Helix, reviews (sample data), brands strip.
+ * why choose, workshop video, Shell Helix, reviews (sample data), brands strip,
+ * FAQ, contact band (placeholder opening hours).
  * Next sections follow the owner's go-ahead.
  * TrustStrip is kept in components/features/home but hidden for now (owner's call).
  */
@@ -26,9 +30,12 @@ export default function HomePage() {
       <HowItWorksSection />
       <WhyChooseSection />
       <VideoShowcaseSection />
+      <BeforeAfterSection />
       <ShellHelixSection />
       <ReviewsSection />
       <BrandsMarquee />
+      <FaqSection />
+      <ContactBand />
     </>
   );
 }

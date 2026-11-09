@@ -209,32 +209,8 @@ export function PublicHeader() {
               ))}
             </Container>
           </nav>
-
-          <Container className="flex shrink-0 flex-col items-center gap-6 pb-10">
-            <div className="flex gap-3">
-              <Button href="/" variant="outline-light" onClick={close} className="tracking-[0.2em] uppercase">
-                Home
-              </Button>
-              <Button href="/book-appointment" onClick={close}>
-                <CalendarCheck aria-hidden="true" />
-                Book Appointment
-              </Button>
-            </div>
-            <p className="flex items-center gap-6 text-sm text-zinc-400">
-              <a href={SITE.phoneHref} className="inline-flex items-center gap-2 hover:text-white">
-                <Phone className="size-4 text-brand-500" aria-hidden="true" />
-                {SITE.phone}
-              </a>
-              <a href={`mailto:${SITE.email}`} className="inline-flex items-center gap-2 hover:text-white">
-                <Mail className="size-4 text-brand-500" aria-hidden="true" />
-                {SITE.email}
-              </a>
-              <span className="inline-flex items-center gap-2">
-                <MapPin className="size-4 text-brand-500" aria-hidden="true" />
-                Vatara, Dhaka
-              </span>
-            </p>
-          </Container>
+          {/* Balances the logo bar so the columns sit in the visual centre. */}
+          <div aria-hidden="true" className="h-24 shrink-0" />
         </div>
 
         {/* Phones/tablets: slide-in side panel. */}

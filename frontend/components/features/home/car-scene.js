@@ -89,11 +89,23 @@ const SHOWCASE_ASSEMBLIES = {
 const PAINT_MATERIALS = /^Paint \d Carmine$/;
 const LIGHT_MATERIALS = /^(Headlight|Brakelight|Signallight)$/;
 const PRIMER = new THREE.Color("#3a3a3f");
+/**
+ * three.js swaps the whole paint shader when clearcoat crosses 0, so it never
+ * goes fully to 0 — otherwise the switch would stall the frame where painting starts.
+ */
+const CLEARCOAT_MIN = 0.001;
+/** How quickly the car catches up with the scroll position (per second). */
+const SMOOTHING = 7;
 
 export class CarScene {
-  constructor(canvas, { onReady, lowPower = false } = {}) {
+  /**
+   * @param getTarget - returns the current scroll progress (0–1); read every frame,
+   *   so scrolling never has to go through React.
+   */
+  constructor(canvas, { onReady, getTarget, lowPower = false } = {}) {
     this.canvas = canvas;
     this.onReady = onReady;
+    this.getTarget = getTarget;
     this.lowPower = lowPower;
     this.target = 0;
     this.progress = 0;
@@ -112,7 +124,8 @@ export class CarScene {
       alpha: true,
       powerPreference: "high-performance",
     });
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, lowPower ? 1.25 : 1.75));
+    // The canvas covers the whole hero, so pixel density is the main GPU cost.
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, lowPower ? 1 : 1.5));
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.renderer.toneMappingExposure = 1.05;
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -236,9 +249,35 @@ export class CarScene {
     this.clipBelowFloor(model);
     this.buildLasers(size);
     this.layoutShowcase();
+    this.createDriveCar();
+    await this.warmUp();
+    if (this.disposed) return;
 
     this.update(true);
     this.onReady?.();
+  }
+
+  /**
+   * Compile every shader and upload every texture now, while the canvas is still
+   * hidden. Otherwise each group of parts (and the paint's clearcoat) is prepared
+   * the first time it appears mid-scroll, which freezes the animation for a moment.
+   */
+  async warmUp() {
+    this.scene.traverse((object) => {
+      object.visible = true;
+    });
+    for (const item of this.paints) {
+      if ("clearcoat" in item.material) item.material.clearcoat = Math.max(item.clearcoat, CLEARCOAT_MIN);
+    }
+    this.updateCamera(0.5);
+    try {
+      await this.renderer.compileAsync(this.scene, this.camera);
+    } catch {
+      // Older drivers without parallel compile: the render below compiles synchronously.
+    }
+    this.renderer.render(this.scene, this.camera);
+    this.driveCar.visible = false;
+    this.driveShadow.visible = false;
   }
 
   /**
@@ -438,9 +477,11 @@ export class CarScene {
   start() {
     if (this.running || this.disposed) return;
     this.running = true;
+    this.lastTick = performance.now();
     const tick = () => {
       if (!this.running) return;
       this.frame = requestAnimationFrame(tick);
+      if (this.getTarget) this.target = clamp(this.getTarget());
       this.update();
     };
     tick();
@@ -452,10 +493,14 @@ export class CarScene {
   }
 
   update(force = false) {
-    // Ease towards the scroll position so motion stays smooth between scroll events.
+    // Ease towards the scroll position so motion glides between scroll steps
+    // (time-based, so it feels the same at 60 Hz and 120 Hz, and after a dropped frame).
+    const now = performance.now();
+    const dt = Math.min(0.1, (now - (this.lastTick ?? now)) / 1000);
+    this.lastTick = now;
     const delta = this.target - this.progress;
-    const moving = Math.abs(delta) > 0.0005;
-    if (moving) this.progress += delta * 0.12;
+    const moving = Math.abs(delta) > 0.0002;
+    if (moving) this.progress += delta * (1 - Math.exp(-SMOOTHING * dt));
     else this.progress = this.target;
 
     // `p` runs the build (0 → 1); after HERO_BUILD_END the finished car drives off.
@@ -510,7 +555,7 @@ export class CarScene {
     const paint = easeInOut(window01(p, 0.5, 0.66));
     for (const item of this.paints) {
       item.material.color.copy(PRIMER).lerp(item.color, paint);
-      if ("clearcoat" in item.material) item.material.clearcoat = item.clearcoat * paint;
+      if ("clearcoat" in item.material) item.material.clearcoat = Math.max(item.clearcoat * paint, CLEARCOAT_MIN);
       item.material.roughness = THREE.MathUtils.lerp(0.75, item.roughness, paint);
       item.material.metalness = THREE.MathUtils.lerp(0.1, item.metalness, paint);
     }
@@ -539,8 +584,6 @@ export class CarScene {
    */
   updateDriveOff(drive, alignRoll) {
     if (!this.model) return;
-
-    if (drive > 0 && !this.driveCar) this.createDriveCar();
 
     // Gentle pull-away that builds speed, so the drive-off reads clearly.
     const distance = 17 * drive ** 1.8;

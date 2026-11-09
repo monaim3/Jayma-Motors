@@ -6,15 +6,22 @@ export const SITE = {
   name: "Jayma Motors",
   url: process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
   description:
-    "Multi-brand car service and repair workshop in Vatara, Dhaka since 2012. Computerized diagnosis, engine & brake service, denting, painting and authorized Shell Helix lubricants.",
+    "Multi-brand car service and repair workshop in Vatara, Dhaka since 2008. Computerized diagnosis, engine & brake service, denting, painting and authorized Shell Helix lubricants.",
   tagline: "Your Car's Care, Our Commitment",
   taglineBn: "আপনার গাড়ির যত্ন, আমাদের অঙ্গীকার — জায়মা মোটরস, যেখানে বিশ্বস্ততা মেলে দক্ষতায়!",
-  since: 2012,
+  since: 2008,
   phone: "01711-949110",
   phoneHref: "tel:+8801711949110",
   whatsappHref: "https://wa.me/8801711949110",
   email: "jaymamotors@gmail.com",
   address: "441-442, Evercare Hospital Road (beside Khanas/Khudos), Vatara, Dhaka, Bangladesh",
+  /**
+   * Workshop map position: the open plot on the south side of Kuwaiti Masjid
+   * Road (beside the pond), marked by the owner on the satellite map. The
+   * Google Business listing pin (23.8106731, 90.4305717) sits on Evercare
+   * Hospital instead — owner to correct it in Google Business Profile.
+   */
+  geo: { lat: 23.807437, lng: 90.427828 },
   social: {
     facebook: "https://www.facebook.com/jaymamotors",
   },

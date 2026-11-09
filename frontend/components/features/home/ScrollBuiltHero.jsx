@@ -23,10 +23,20 @@ const getReducedMotionOnServer = () => false;
  * through it; the car assembles and each stage names a Jayma service.
  * Reduced-motion visitors get the finished car and the stages as a list.
  */
+/** Caption shown for a given scroll progress (the last one stays during the drive-off). */
+function stageAt(progress) {
+  const build = Math.min(1, progress / HERO_BUILD_END);
+  return Math.min(HERO_STAGES.length - 1, Math.floor(build * HERO_STAGES.length));
+}
+
 export function ScrollBuiltHero() {
   const sectionRef = useRef(null);
   const stickyRef = useRef(null);
-  const [progress, setProgress] = useState(0);
+  // Scroll progress lives in a ref: the 3D scene reads it every frame, so
+  // scrolling doesn't re-render React. State changes only when the caption does.
+  const progressRef = useRef(0);
+  const [stageIndex, setStageIndex] = useState(0);
+  const [atTop, setAtTop] = useState(true);
   const reducedMotion = useSyncExternalStore(subscribeReducedMotion, getReducedMotion, getReducedMotionOnServer);
 
   const measure = useCallback(() => {
@@ -38,8 +48,16 @@ export function ScrollBuiltHero() {
     const distance = section.offsetHeight - sticky.offsetHeight;
     const next = distance > 0 ? clamp((stickyTop - section.getBoundingClientRect().top) / distance) : 1;
 
-    setProgress((current) => (Math.abs(current - next) > 0.001 ? next : current));
+    progressRef.current = next;
+    setStageIndex(stageAt(next));
+    setAtTop(next < 0.03);
   }, []);
+
+  // Reduced motion: the finished car standing still (no drive-off).
+  const getProgress = useCallback(
+    () => (reducedMotion ? HERO_BUILD_END : progressRef.current),
+    [reducedMotion],
+  );
 
   // The hero tells a story from the top, so a reload starts at the floating parts
   // instead of the browser restoring the previous scroll position mid-animation.
@@ -72,12 +90,12 @@ export function ScrollBuiltHero() {
     };
   }, [measure, reducedMotion]);
 
-  // Reduced motion: show the finished car standing still (no drive-off).
-  const shown = reducedMotion ? HERO_BUILD_END : progress;
-  // Captions follow the build; the last one stays while the car drives off.
-  const build = Math.min(1, shown / HERO_BUILD_END);
-  const stageIndex = Math.min(HERO_STAGES.length - 1, Math.floor(build * HERO_STAGES.length));
-  const stage = HERO_STAGES[stageIndex];
+  const shownStage = reducedMotion ? HERO_STAGES.length - 1 : stageIndex;
+  const stage = HERO_STAGES[shownStage];
+  // Line-art fallback (no WebGL) steps through the stages.
+  const fallbackProgress = reducedMotion
+    ? HERO_BUILD_END
+    : ((shownStage + 0.5) / HERO_STAGES.length) * HERO_BUILD_END;
 
   /** Scroll so the given stage is in view (progress rail buttons). */
   const goToStage = (index) => {
@@ -122,7 +140,7 @@ export function ScrollBuiltHero() {
         {/* 3D stage fills the hero; the camera frames the car beside (desktop) or below (phones) the text. */}
         {/* Soft fade at the bottom so the hero flows into the booking form below. */}
         <div className="absolute inset-0 [mask-image:linear-gradient(to_bottom,black_85%,transparent)]">
-          <HeroCar3D progress={shown} />
+          <HeroCar3D getProgress={getProgress} fallbackProgress={fallbackProgress} />
         </div>
         {/* Keeps the text readable when floating parts drift behind it. */}
         <div
@@ -188,7 +206,7 @@ export function ScrollBuiltHero() {
               aria-hidden="true"
               className={cn(
                 "absolute inset-x-0 bottom-4 flex flex-col items-center gap-1 text-xs text-zinc-400 transition-opacity",
-                progress < 0.03 ? "opacity-100" : "opacity-0",
+                atTop ? "opacity-100" : "opacity-0",
               )}
             >
               Scroll to build

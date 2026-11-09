@@ -72,11 +72,11 @@ export const VEHICLE_BRANDS = [
  * the owner before launch (Step 10 checklist).
  */
 export const HOME_STATS = [
-  // Since 2012. Fixed number (reading the clock breaks static prerendering); bump yearly.
-  { value: 14, suffix: "+", label: "Years in service" },
+  // Since 2008. Fixed number (reading the clock breaks static prerendering); bump yearly.
+  { value: 18, suffix: "+", label: "Years in service" },
   { value: 10000, suffix: "+", label: "Cars serviced", placeholder: true },
   { value: 20, suffix: "+", label: "Car brands" },
-  { value: 15, suffix: "+", label: "Expert technicians", placeholder: true },
+  { value: 30, suffix: "+", label: "Expert technicians" },
 ];
 
 /** "Why choose Jayma" points (owner to confirm wording before launch). */
@@ -182,11 +182,46 @@ export const HOME_REVIEWS = [
   },
 ];
 
+/** Home FAQ (owner to confirm the answers before launch). Also output as FAQPage structured data. */
+export const HOME_FAQS = [
+  {
+    q: "Which car brands do you service?",
+    a: "All major makes — Japanese, Korean and European. Toyota, Honda, Nissan, Mitsubishi, Hyundai, Kia, BMW, Mercedes-Benz, Audi and many more.",
+  },
+  {
+    q: "Do I need an appointment?",
+    a: "Walk-ins are welcome, but booking ahead means your car gets a slot without waiting. Book online in a minute, or call or WhatsApp us.",
+  },
+  {
+    q: "How long does a regular service take?",
+    a: "A routine service or oil change usually takes a few hours, and most cars are ready the same day. Bigger repairs, denting or painting take longer — we tell you the time with the quote.",
+  },
+  {
+    q: "Will I know the price before the work starts?",
+    a: "Yes. We diagnose the car first, explain the problem and give you the price. Work starts only after you approve it.",
+  },
+  {
+    q: "Do you use genuine parts and oil?",
+    a: "Yes. We are an authorized Shell Helix dealer and use genuine, sealed oils and quality parts — never refilled or diluted.",
+  },
+  {
+    q: "Do you offer pick-up and drop or emergency help?",
+    a: "Yes — call or WhatsApp us with your location and the problem, and we will arrange pick-up and drop or help in an emergency.",
+  },
+];
+
+/**
+ * Opening hours — open every day, closing 9 PM (confirmed by the owner); the
+ * 9 AM opening time is still a placeholder to confirm (Step 10 checklist).
+ * Later read from the admin-edited site settings.
+ */
+export const OPENING_HOURS = [{ days: "Every day", time: "9:00 AM – 9:00 PM" }];
+
 /** Shell Helix highlight: common grades kept in stock (owner to confirm). */
 export const SHELL_GRADES = ["0W-20", "5W-30", "5W-40", "10W-40", "15W-40"];
 
 export const TRUST_ITEMS = [
-  { icon: "ShieldCheck", title: "Since 2012", text: "Trusted multi-brand workshop" },
+  { icon: "ShieldCheck", title: "Since 2008", text: "Trusted multi-brand workshop" },
   { icon: "Cpu", title: "Computerized diagnosis", text: "Accurate fault finding" },
   { icon: "Award", title: "Certified technicians", text: "Skilled, experienced team" },
   { icon: "Droplets", title: "Authorized Shell Helix dealer", text: "Genuine lubricants" },

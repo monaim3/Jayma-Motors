@@ -16,7 +16,7 @@ export function WhyChooseSection() {
               id="why-heading"
               className="mt-2 font-display text-4xl leading-[1.1] font-medium text-white sm:text-5xl"
             >
-              Trusted care, done right — <span className="text-brand-500">since 2012</span>
+              Trusted care, done right — <span className="text-brand-500">since 2008</span>
             </h2>
           </div>
           <p className="max-w-xl text-zinc-400 lg:justify-self-end">

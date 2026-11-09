@@ -166,7 +166,7 @@ Every component has these states where applicable: default, hover, focus (visibl
 │                       PAGE CONTENT                          │
 ├────────────────────────────────────────────────────────────┤
 │ Footer (dark): logo + tagline · quick links · services ·    │
-│ contact + map link · social · "Since 2012" · legal links    │
+│ contact + map link · social · "Since 2008" · legal links    │
 │ · Management login (small)                                 │
 └────────────────────────────────────────────────────────────┘
   Floating: [WhatsApp] [Call]          Mobile sticky: [Book Appointment]
@@ -235,8 +235,8 @@ Centered card (max 440 px) on a split screen: left half workshop photo with logo
 
 | # | Section | Content |
 |---|---|---|
-| 1 | Hero — **"Scroll-built car"** | See §6.1.1. Ends with headline "Your Car's Care, Our Commitment", sub-line "Multi-brand car service & repair in Dhaka since 2012", buttons **Book Appointment** (primary) and **Call 01711-949110** (outline) |
-| 2 | Trust strip | Since 2012 · Certified technicians · Computerized diagnosis · Authorized Shell Helix dealer (icons) |
+| 1 | Hero — **"Scroll-built car"** | See §6.1.1. Ends with headline "Your Car's Care, Our Commitment", sub-line "Multi-brand car service & repair in Dhaka since 2008", buttons **Book Appointment** (primary) and **Call 01711-949110** (outline) |
+| 2 | Trust strip | Since 2008 · Certified technicians · Computerized diagnosis · Authorized Shell Helix dealer (icons) |
 | 3 | Services | 6–8 featured service cards (icon/image, name, short text, "Learn more"); "View all services" |
 | 4 | About intro | Photo + short story, Bangla tagline as a quote, "About us" link |
 | 5 | Why choose us | 4–6 reasons with icons |

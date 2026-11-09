@@ -1,0 +1,115 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{width:1640px;height:624px;overflow:hidden;background:#0b0b0d}
+  .cover{position:relative;width:1640px;height:624px;overflow:hidden;
+    background:
+      radial-gradient(ellipse 620px 420px at 30% 55%, rgba(196,40,40,.28), transparent 70%),
+      radial-gradient(ellipse 900px 500px at 85% 120%, rgba(196,40,40,.18), transparent 70%),
+      linear-gradient(160deg,#16161a 0%,#0b0b0d 55%,#070708 100%);
+    font-family:Inter,sans-serif;color:#fff}
+  /* fine grid */
+  .grid{position:absolute;inset:0;
+    background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),
+                     linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);
+    background-size:48px 48px;
+    mask-image:radial-gradient(ellipse 70% 80% at 50% 50%,#000 30%,transparent 80%)}
+  /* speed streaks */
+  .streaks{position:absolute;inset:0}
+  /* giant outlined year */
+  .year{position:absolute;right:-30px;top:-70px;font-family:Rajdhani;font-weight:700;
+    font-size:430px;line-height:1;letter-spacing:-10px;color:transparent;
+    -webkit-text-stroke:1.5px rgba(255,255,255,.06)}
+  .content{position:absolute;left:265px;right:265px;top:0;bottom:0;
+    display:flex;align-items:center;gap:48px}
+  .logo{width:420px;flex:none;filter:drop-shadow(0 10px 40px rgba(196,40,40,.35))}
+  .divider{width:2px;height:250px;flex:none;
+    background:linear-gradient(transparent,rgba(196,40,40,.9),transparent)}
+  .text{flex:1}
+  .eyebrow{display:inline-flex;align-items:center;gap:10px;font-size:15px;font-weight:600;
+    letter-spacing:4px;text-transform:uppercase;color:#ff4b4b;margin-bottom:14px}
+  .eyebrow:before{content:"";width:28px;height:2px;background:#e03131}
+  h1{font-family:Rajdhani;font-weight:700;font-size:60px;line-height:.98;letter-spacing:.5px;
+    text-transform:uppercase}
+  h1 span{color:#e03131}
+  .chips{display:flex;flex-wrap:wrap;gap:10px;margin:20px 0 22px;max-width:600px}
+  .chip{font-size:14px;font-weight:500;padding:8px 15px;border-radius:999px;
+    border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.05);color:#e6e6e6}
+  .book{display:flex;align-items:center;gap:6px;margin-bottom:14px}
+  .book .tag{font-family:Rajdhani;font-weight:700;font-size:20px;letter-spacing:2px;
+    padding:6px 26px 6px 18px;background:linear-gradient(135deg,#e03131,#a51d1d);
+    clip-path:polygon(0 0,100% 0,calc(100% - 16px) 100%,0 100%);
+    box-shadow:0 8px 24px rgba(224,49,49,.35)}
+  .book .sl{width:10px;height:32px;background:#e03131;transform:skewX(-27deg)}
+  .book .sl+.sl{opacity:.6}
+  .info{display:flex;flex-direction:column;gap:9px}
+  .row{display:flex;align-items:center;gap:10px;font-size:16px;font-weight:600;color:#f1f1f1;white-space:nowrap}
+  .row .ic{width:26px;height:26px;border-radius:7px;flex:none;display:grid;place-items:center;
+    background:rgba(224,49,49,.15);border:1px solid rgba(224,49,49,.45)}
+  .row.phones{font-family:Rajdhani;font-size:24px;font-weight:700;letter-spacing:.5px}
+  .row .muted{color:#bdbdbd;font-weight:500}
+  /* bottom accent bar */
+  .bar{position:absolute;left:0;right:0;bottom:0;height:6px;
+    background:linear-gradient(90deg,transparent,#e03131 30%,#e03131 70%,transparent)}
+</style></head>
+<body><div class="cover">
+  <div class="grid"></div>
+  <div class="year">2008</div>
+  <svg class="streaks" width="1640" height="624" viewBox="0 0 1640 624">
+    <defs>
+      <linearGradient id="r" x1="0" x2="1"><stop offset="0" stop-color="#e03131" stop-opacity="0"/><stop offset=".6" stop-color="#e03131" stop-opacity=".9"/><stop offset="1" stop-color="#e03131" stop-opacity="0"/></linearGradient>
+      <linearGradient id="w" x1="0" x2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".6" stop-color="#fff" stop-opacity=".35"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+    </defs>
+    <g transform="skewX(-20)">
+      <rect x="40" y="96" width="520" height="3" fill="url(#r)"/>
+      <rect x="160" y="118" width="300" height="1.5" fill="url(#w)"/>
+      <rect x="1350" y="548" width="560" height="3" fill="url(#r)"/>
+      <rect x="1480" y="570" width="320" height="1.5" fill="url(#w)"/>
+      <rect x="1180" y="80" width="380" height="1.5" fill="url(#w)"/>
+      <rect x="120" y="520" width="420" height="1.5" fill="url(#w)"/>
+    </g>
+    <!-- slanted red panel on right edge -->
+    <polygon points="1520,0 1640,0 1640,624 1360,624" fill="#e03131" opacity=".08"/>
+    <polygon points="1585,0 1640,0 1640,624 1450,624" fill="#e03131" opacity=".12"/>
+    <polygon points="0,0 110,0 -60,624 0,624" fill="#e03131" opacity=".08"/>
+  </svg>
+
+  <div class="content">
+    <img class="logo" src="logo-white.png" alt="">
+    <div class="divider"></div>
+    <div class="text">
+      <h1>Your Car's Care,<br><span>Our Commitment</span></h1>
+      <div class="chips">
+        <div class="chip">Computerized Diagnosis</div>
+        <div class="chip">Engine &amp; Brake</div>
+        <div class="chip">Denting &amp; Painting</div>
+        <div class="chip">Wheel Alignment</div>
+        <div class="chip">Shell Helix Authorized</div>
+      </div>
+      <div class="book"><div class="tag">BOOK NOW</div><div class="sl"></div><div class="sl"></div></div>
+      <div class="info">
+        <div class="row phones">
+          <div class="ic"><svg width="14" height="14" viewBox="0 0 24 24" fill="#ff4b4b"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1A17 17 0 0 1 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1l-2.3 2.2z"/></svg></div>
+          +8801711949110 <span class="muted">/</span> +8801347544000
+        </div>
+        <div class="row">
+          <div class="ic"><svg width="14" height="14" viewBox="0 0 24 24" fill="#ff4b4b"><path d="M14 8V6c0-.8.4-1.2 1.3-1.2H17V1.2C16.6 1.1 15.4 1 14.1 1 11.2 1 9.6 2.7 9.6 5.7V8H6.5v3.6h3.1V23H14V11.6h3l.5-3.6H14z"/></svg></div>
+          @jaymamotors
+          <div class="ic" style="margin-left:18px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ff4b4b" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/></svg></div>
+          jaymamotors.com
+        </div>
+        <div class="row">
+          <div class="ic"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ff4b4b" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg></div>
+          jaymamotors@gmail.com
+        </div>
+        <div class="row">
+          <div class="ic"><svg width="14" height="14" viewBox="0 0 24 24" fill="#ff4b4b"><path d="M12 2a7 7 0 0 0-7 7c0 5.2 7 13 7 13s7-7.8 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg></div>
+          <span class="muted">442 Evercare Hospital Rd (Beside Khanas/Kudos), Vatara</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="bar"></div>
+</div></body></html>

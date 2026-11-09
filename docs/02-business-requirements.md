@@ -25,7 +25,7 @@ Nothing tagged [PROPOSED] is built unless the owner confirms it.
 |---|---|
 | Name | Jayma Motors |
 | Type | Multi-brand car service & repair workshop ("One-stop Vehicle Solution") |
-| Since | 2012 |
+| Since | 2008 |
 | Also | Importer of vehicle parts; authorized dealer of SHELL HELIX lubricants (Ranks Petroleum Limited) |
 | Address | 441-442, Evercare Hospital Road (beside Khanas/Khudos), Vatara, Dhaka, Bangladesh |
 | Phone | 01711-949110 |
@@ -96,7 +96,7 @@ Detailed permissions per role are defined in Step 3.
 
 | Page | Content |
 |---|---|
-| Home | Hero, appointment form, company intro (since 2012), services, work showcase, latest blog posts, testimonials, client/partner logos, second appointment form |
+| Home | Hero, appointment form, company intro (since 2008), services, work showcase, latest blog posts, testimonials, client/partner logos, second appointment form |
 | About Us | Company story, experience, team/facility |
 | Why Us | Reasons to choose Jayma Motors |
 | Services | All services; each with its own detail page |
