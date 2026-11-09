@@ -152,7 +152,7 @@ export function ScrollBuiltHero() {
         <Container className="pointer-events-none relative flex h-full flex-col pt-28 sm:pt-32 lg:justify-center-safe lg:pt-36 lg:pb-12">
           <div className="pointer-events-auto max-w-md xl:max-w-lg">
             <p className="text-xs font-semibold tracking-[0.2em] text-brand-500 uppercase sm:text-sm">
-              Car service &amp; repair · Dhaka · Since {SITE.since}
+              Independent multi-brand workshop · Dhaka · Since {SITE.since}
             </p>
             <h1 className="mt-3 font-display text-4xl leading-[1.1] font-medium text-white sm:text-5xl xl:text-6xl">
               Your Car&apos;s Care, Our <span className="text-brand-500">Commitment</span>

@@ -49,6 +49,13 @@
   }
 }
 
+/* Reviews page: rating bars grow from the left. */
+@keyframes bar-grow {
+  from {
+    transform: scaleX(0);
+  }
+}
+
 @theme inline {
   /* Brands marquee: the track holds two identical halves, so -50% loops seamlessly. */
   --animate-marquee: marquee 60s linear infinite;

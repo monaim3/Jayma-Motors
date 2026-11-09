@@ -8,13 +8,13 @@ import logoWhite from "@/public/brand/logo-white.png";
  * Jayma Motors logo. `variant="white"` for dark backgrounds.
  * Height is set by className (e.g. "h-10"); width follows the logo's ratio.
  */
-export function Logo({ variant = "color", href = "/", className, preload = false }) {
+export function Logo({ variant = "color", href = "/", className, preload = false, sizes = "160px" }) {
   const image = (
     <Image
       src={variant === "white" ? logoWhite : logo}
       alt="Jayma Motors"
       preload={preload}
-      sizes="160px"
+      sizes={sizes}
       className={cn("h-10 w-auto", className)}
     />
   );

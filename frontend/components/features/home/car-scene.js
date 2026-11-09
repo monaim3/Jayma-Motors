@@ -7,8 +7,9 @@ import { HERO_BUILD_END } from "@/lib/home-content";
 /**
  * Scroll-assembled 3D car for the home hero (Step 5 §6.1.1).
  *
- * Model: "Car Concept" by Eric Chadwick, Darmstadt Graphics Group GmbH,
- * Khronos glTF-Sample-Assets, CC BY 4.0 (optimised by scripts/optimize-car.mjs).
+ * Model: "2010 Mercedes SLS AMG" by Dave Love (sketchfab.com/Tyler_Dave),
+ * https://sketchfab.com/3d-models/2010-mercedes-sls-amg-fa3fd5eeea674f37bb03283f2c53d563,
+ * CC BY 4.0 — re-cut into animatable parts by scripts/optimize-sls.mjs.
  *
  * Opening: a clean showcase — a few hero parts (wheels, steering wheel, mirror,
  * seats) float apart and turn slowly. Nothing else is visible yet.
@@ -49,7 +50,7 @@ function seeded(seed) {
 const SHOWCASE = [
   { name: "WheelFrontL", slot: [-0.06, 0.46], turn: [0.25, 0.7, 0.1], start: 0.2, end: 0.31 },
   { name: "InteriorSteeringCylinder", slot: [0.34, 0.4], turn: [0.6, -0.5, 0.3], start: 0.18, end: 0.29 },
-  { name: "ShowcaseMirror", slot: [-0.36, 0.1], turn: [0.1, 0.9, -0.2], start: 0.42, end: 0.5, size: 1.6 },
+  { name: "ShowcaseMirror", slot: [-0.36, 0.1], turn: [0.1, 0.9, -0.2], start: 0.42, end: 0.5, size: 0.9 },
   { name: "WheelFrontR", slot: [0.44, -0.02], turn: [-0.2, -0.8, 0.15], start: 0.22, end: 0.33 },
   { name: "WheelRearL", slot: [-0.3, -0.36], turn: [0.3, 0.5, -0.1], start: 0.21, end: 0.32 },
   { name: "ShowcaseSeats", slot: [0.2, -0.34], turn: [0.15, 0.9, 0.05], start: 0.17, end: 0.28, size: 0.5 },
@@ -70,6 +71,8 @@ const GROUPS = [
     distance: 1.8,
   },
   { match: /^Wheel/, start: 0.22, end: 0.33, distance: 1.6, sideways: true },
+  // The one-piece body shell is lowered onto the chassis, as on a factory line.
+  { match: /^BodyPanels$/, start: 0.33, end: 0.48, distance: 2.6, fromAbove: true },
   {
     match: /^(BodyPanels|BodyPillars|BodyRoofPanel|BodyRearPanels|BodyHood|BodyDoor)/,
     start: 0.33,
@@ -84,16 +87,18 @@ const FALLBACK_GROUP = { start: 0.35, end: 0.48, distance: 2 };
 /** Multi-mesh parts gathered into one showcase object each. */
 const SHOWCASE_ASSEMBLIES = {
   ShowcaseMirror: ["BodyDoorLMirror", "BodyDoorLMirrorColor1", "BodyDoorLMirrorColor2"],
-  ShowcaseSeats: ["InteriorSeatsColor1", "InteriorSeatsColor2", "InteriorSeatsFrame1", "InteriorSeatsFrame2"],
+  ShowcaseSeats: ["InteriorSeats"],
 };
-const PAINT_MATERIALS = /^Paint \d Carmine$/;
-const LIGHT_MATERIALS = /^(Headlight|Brakelight|Signallight)$/;
+const PAINT_MATERIALS = /^(INT_)?Carpaint/;
+const LIGHT_MATERIALS = /^(Lights_Front|Lights_Rear|EXT_Microluci)/;
 const PRIMER = new THREE.Color("#3a3a3f");
 /**
  * three.js swaps the whole paint shader when clearcoat crosses 0, so it never
  * goes fully to 0 — otherwise the switch would stall the frame where painting starts.
  */
 const CLEARCOAT_MIN = 0.001;
+/** Environment reflection strength on the body paint (keeps the red deep). */
+const PAINT_ENV = 0.35;
 /** How quickly the car catches up with the scroll position (per second). */
 const SMOOTHING = 7;
 
@@ -362,20 +367,25 @@ export class CarScene {
       let direction = partCenter.clone().sub(carCenter);
       if (group.sideways) direction = this.side.clone().multiplyScalar(Math.sign(direction.dot(this.side)) || 1);
       direction.y = Math.max(direction.y, 0) * 0.5 + 0.25 + random() * 0.35;
+      if (group.fromAbove) direction.set(0, 1, 0);
       direction.normalize();
 
       // Parts are direct children of the model, so world offsets equal local offsets.
-      const offset = direction.multiplyScalar(group.distance * (0.75 + random() * 0.5));
-      const spin = new THREE.Euler((random() - 0.5) * 1.4, (random() - 0.5) * 1.4, (random() - 0.5) * 1.4);
+      const offset = direction.multiplyScalar(group.distance * (group.fromAbove ? 1 : 0.75 + random() * 0.5));
+      // The lowered body stays level and full size; flying parts tumble and grow in.
+      const spin = group.fromAbove
+        ? new THREE.Euler(0, 0, 0)
+        : new THREE.Euler((random() - 0.5) * 1.4, (random() - 0.5) * 1.4, (random() - 0.5) * 1.4);
       const span = group.end - group.start;
-      const delay = random() * span * 0.45;
+      const delay = group.fromAbove ? 0 : random() * span * 0.45;
 
       this.parts.push({
         ...base,
         offset,
         startQuaternion: node.quaternion.clone().multiply(new THREE.Quaternion().setFromEuler(spin)),
         start: group.start + delay,
-        end: Math.min(group.end, group.start + delay + span * 0.6),
+        end: group.fromAbove ? group.end : Math.min(group.end, group.start + delay + span * 0.6),
+        minScale: group.fromAbove ? 1 : 0.4,
       });
     }
   }
@@ -416,6 +426,12 @@ export class CarScene {
         if (seen.has(material)) continue;
         seen.add(material);
         if (PAINT_MATERIALS.test(material.name)) {
+          // The studio environment is bright on every side; at full strength its
+          // reflection washes the red into pink. Dim it on the paint only.
+          // (three.js only honours envMapIntensity when the material has its own envMap;
+          // otherwise scene.environmentIntensity applies.)
+          material.envMap = this.envTexture;
+          material.envMapIntensity = PAINT_ENV;
           this.paints.push({
             material,
             color: material.color.clone(),
@@ -548,10 +564,10 @@ export class CarScene {
       part.node.visible = p >= part.start - 0.005;
       part.node.position.copy(part.basePosition).addScaledVector(part.offset, 1 - t);
       part.node.quaternion.slerpQuaternions(part.startQuaternion, part.baseQuaternion, t);
-      part.node.scale.copy(part.baseScale).multiplyScalar(THREE.MathUtils.lerp(0.4, 1, easeOutCubic(clamp(raw * 2))));
+      part.node.scale.copy(part.baseScale).multiplyScalar(THREE.MathUtils.lerp(part.minScale, 1, easeOutCubic(clamp(raw * 2))));
     }
 
-    // Paint: primer grey → Carmine candy.
+    // Paint: primer grey → metallic red.
     const paint = easeInOut(window01(p, 0.5, 0.66));
     for (const item of this.paints) {
       item.material.color.copy(PRIMER).lerp(item.color, paint);

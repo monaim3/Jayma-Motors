@@ -12,19 +12,24 @@ export const SITE = {
   since: 2008,
   phone: "01711-949110",
   phoneHref: "tel:+8801711949110",
+  // Second hotline (owner, 2026-11-09).
+  hotline: "01347-544000",
+  hotlineHref: "tel:+8801347544000",
   whatsappHref: "https://wa.me/8801711949110",
   email: "jaymamotors@gmail.com",
   address: "441-442, Evercare Hospital Road (beside Khanas/Khudos), Vatara, Dhaka, Bangladesh",
   /**
    * Workshop map position: the open plot on the south side of Kuwaiti Masjid
    * Road (beside the pond), marked by the owner on the satellite map. The
-   * Google Business listing pin (23.8106731, 90.4305717) sits on Evercare
-   * Hospital instead — owner to correct it in Google Business Profile.
+   * Google Business pin now matches it (23.8076367, 90.4276655, checked 2026-11-09).
    */
   geo: { lat: 23.807437, lng: 90.427828 },
   social: {
     facebook: "https://www.facebook.com/jaymamotors",
   },
+  // Google Business listing (place ID ChIJEbiRprPHVTcRY_mnWjW2_BA).
+  googleReviewsUrl: "https://search.google.com/local/reviews?placeid=ChIJEbiRprPHVTcRY_mnWjW2_BA",
+  googleWriteReviewUrl: "https://search.google.com/local/writereview?placeid=ChIJEbiRprPHVTcRY_mnWjW2_BA",
 };
 
 export const PUBLIC_NAV = [
@@ -39,8 +44,7 @@ export const PUBLIC_NAV = [
 ];
 
 export const FOOTER_LINKS = [
-  { href: "/why-us", label: "Why Us" },
-  { href: "/shell-helix", label: "Shell Helix Lubricants" },
+  { href: "/about", label: "About Us" },
   { href: "/service-enquiry", label: "Service Enquiry" },
   { href: "/book-appointment", label: "Book Appointment" },
   { href: "/terms", label: "Terms & Conditions" },

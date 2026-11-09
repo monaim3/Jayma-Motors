@@ -21,8 +21,19 @@ const nextConfig = {
         pathname: "/storage/**",
       },
     ],
+    // 90 = large hero photos (service pages); everything else uses the default 75.
+    qualities: [75, 90],
     // Next 16 blocks images from local IPs by default; the Laravel dev server runs on localhost.
     dangerouslyAllowLocalIP: isDev,
+  },
+
+  // Pages dropped from the plan (owner, 2026-11-09): keep old/shared links working.
+  async redirects() {
+    return [
+      { source: "/why-us", destination: "/about", permanent: true },
+      // Temporary: points to /products (Shell Helix category) once that page exists.
+      { source: "/shell-helix", destination: "/#shell-helix", permanent: false },
+    ];
   },
 
   async headers() {

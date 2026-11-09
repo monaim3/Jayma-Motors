@@ -86,6 +86,12 @@ export function ContactBand() {
                 </span>
               </span>
             </a>
+            <p className="mt-3 pl-[4.5rem] text-sm text-zinc-400">
+              Hotline:{" "}
+              <a href={SITE.hotlineHref} className="font-semibold text-white hover:text-brand-500">
+                {SITE.hotline}
+              </a>
+            </p>
 
             <div className="mt-8 flex flex-wrap gap-3">
               <Button href="#appointment" size="lg" className="shadow-lg shadow-brand-900/50">

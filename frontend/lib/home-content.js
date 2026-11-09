@@ -3,6 +3,8 @@
  * milestone B2/F2; until then this list (decision D6) feeds the home page.
  */
 
+import { FEATURED_REVIEW, GOOGLE_REVIEWS } from "@/lib/reviews-content";
+
 /**
  * Share of the hero's scroll used to build the car; the rest is the drive-off,
  * where the finished car drives out of the frame.
@@ -145,41 +147,12 @@ export const HOW_STEPS = [
   },
 ];
 
-/**
- * SAMPLE reviews for layout only — NOT real customers. Replace with the
- * owner's real Google/Facebook reviews before launch (later: the reviews API).
- */
+/** Home carousel: real Google reviews (lib/reviews-content), the longer English ones. */
 export const HOME_REVIEWS = [
-  {
-    name: "Rahim Uddin",
-    car: "Toyota Axio",
-    rating: 5,
-    text: "They found an engine fault two other garages missed. Clear price up front and the car was ready the same day.",
-  },
-  {
-    name: "Nusrat Jahan",
-    car: "Honda Vezel",
-    rating: 5,
-    text: "Full body paint after a scratch — the finish looks factory new. Friendly team that kept me updated on WhatsApp.",
-  },
-  {
-    name: "Tanvir Ahmed",
-    car: "Mitsubishi Pajero",
-    rating: 5,
-    text: "Regular oil change with genuine Shell Helix. Honest advice, no unnecessary parts pushed on me.",
-  },
-  {
-    name: "Farhana Islam",
-    car: "Toyota Premio",
-    rating: 4,
-    text: "Wheel alignment and balancing done quickly. The car drives straight and smooth again.",
-  },
-  {
-    name: "Shakil Hossain",
-    car: "Nissan X-Trail",
-    rating: 5,
-    text: "Dent and bumper repair after a small accident. You can't even tell where the damage was.",
-  },
+  FEATURED_REVIEW,
+  ...["SAIMUM AREFEEN", "S. M. Shoaib", "Tanvir Shawkat", "Md Imranur Rahman", "Imroze Parvez"].map((name) =>
+    GOOGLE_REVIEWS.find((review) => review.name === name),
+  ),
 ];
 
 /** Home FAQ (owner to confirm the answers before launch). Also output as FAQPage structured data. */

@@ -56,6 +56,12 @@ export function PublicFooter() {
               </a>
             </li>
             <li>
+              <a href={SITE.hotlineHref} className="flex gap-3 hover:text-white">
+                <Phone className="mt-0.5 size-4 shrink-0 text-brand-500" aria-hidden="true" />
+                {SITE.hotline} <span className="text-zinc-500">(hotline)</span>
+              </a>
+            </li>
+            <li>
               <a href={`mailto:${SITE.email}`} className="flex gap-3 break-all hover:text-white">
                 <Mail className="mt-0.5 size-4 shrink-0 text-brand-500" aria-hidden="true" />
                 {SITE.email}
@@ -68,19 +74,29 @@ export function PublicFooter() {
       <div className="border-t border-white/10">
         <Container className="flex flex-col gap-2 py-5 text-xs sm:flex-row sm:items-center sm:justify-between">
           <p>
-            © {SITE.name}. Serving Dhaka since {SITE.since}.
+            © {SITE.name}. Serving Dhaka since {SITE.since}. Independent multi-brand workshop — not affiliated
+            with any car manufacturer.
           </p>
           <p className="text-zinc-500">
             3D car model:{" "}
             <a
-              href="https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/CarConcept"
+              href="https://sketchfab.com/3d-models/2010-mercedes-sls-amg-fa3fd5eeea674f37bb03283f2c53d563"
               target="_blank"
               rel="noopener noreferrer"
               className="underline hover:text-white"
             >
-              “Car Concept”
+              “2010 Mercedes SLS AMG”
             </a>{" "}
-            by Eric Chadwick, DGG,{" "}
+            by{" "}
+            <a
+              href="https://sketchfab.com/Tyler_Dave"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline hover:text-white"
+            >
+              Dave Love
+            </a>
+            ,{" "}
             <a
               href="https://creativecommons.org/licenses/by/4.0/"
               target="_blank"

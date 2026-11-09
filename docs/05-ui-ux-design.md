@@ -174,7 +174,7 @@ Every component has these states where applicable: default, hover, focus (visibl
 
 - Header becomes sticky with a white background after scrolling.
 - Mobile: logo + hamburger; menu opens as a full-height drawer with large tap targets, phone and WhatsApp buttons at the bottom.
-- "More" items (Why Us, Shell Helix Lubricants, Service Enquiry) appear under About/Products dropdowns and in the footer.
+- "More" items (Service Enquiry, Book Appointment, legal pages) appear in the menu and footer. (Why Us and Shell Helix pages dropped 2026-11-09.)
 
 ### 4.2 Auth layout
 
@@ -203,10 +203,10 @@ Centered card (max 440 px) on a split screen: left half workshop photo with logo
 |---|---|
 | `/` | Home |
 | `/about` | About Us |
-| `/why-us` | Why Us |
+| ~~`/why-us`~~ | Dropped 2026-11-09 (owner): duplicates home "Why choose" + About values. Redirects to `/about` |
 | `/services` · `/services/[slug]` | Services list · Service detail |
 | `/products` · `/products/[slug]` | Lubricants & Parts list · Product detail |
-| `/shell-helix` | Shell Helix Lubricants (special page, D11) |
+| ~~`/shell-helix`~~ | Dropped 2026-11-09 (owner): covered by the home Shell Helix section and the Products "Shell Helix Lubricants" category. Redirects to `/#shell-helix` (→ `/products` once built) |
 | `/gallery` · `/gallery/[album]` | Gallery |
 | `/blog` · `/blog/[slug]` | Blog list · Post |
 | `/reviews` | Reviews + write a review |
@@ -337,7 +337,7 @@ Form with all M3 fields; services as multi-select checkboxes; "How did you hear 
 
 ### 6.10 Contact
 
-Contact cards (address, phone, email, WhatsApp, opening hours when set), embedded Google Map, and two buttons: **Send a Service Enquiry** and **Book Appointment**. No separate contact form (U6), so every message arrives through the enquiry workflow staff already manage.
+Contact cards (address, phone + hotline, email, WhatsApp, Facebook, opening hours), a **contact message form** (name, phone, email optional, subject, message), the 3D workshop map, and two buttons: **Send a Service Enquiry** and **Book Appointment**. The form was added at the owner's request on 2026-11-09, replacing the original U6 default; messages arrive in the admin panel alongside enquiries.
 
 ### 6.11 Error pages
 
@@ -450,5 +450,5 @@ Title + primary action (e.g. "New service record") → filters bar (search, stat
 | U8 | Home hero | **Scroll-built car** (§6.1.1), image-sequence technique; assembly frames source to be chosen before Step 8 |
 | U4 | Fonts | Montserrat (headings) + Inter (body) |
 | U5 | Hero headline | "Your Car's Care, Our Commitment" (English version of the tagline) |
-| U6 | Contact page form | Default: no separate form; contact page links to Service Enquiry |
+| U6 | Contact page form | **Changed 2026-11-09 (owner):** contact page has its own message form (`POST /contact-messages`), plus links to Service Enquiry |
 | U7 | Visual preview | Optional: a clickable HTML preview of colours, components and the home page before development |

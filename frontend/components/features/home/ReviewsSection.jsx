@@ -37,7 +37,7 @@ function offsetOf(index, active) {
  * Home: customer reviews as a 3D carousel — the active card faces front, its
  * neighbours swing back on either side (rotateY) with a red tint toward the
  * centre. Arrows on the side cards (dots row on phones), dots, swipe, click a
- * side card, and autoplay while on screen. SAMPLE data until real reviews arrive.
+ * side card, and autoplay while on screen. Real Google reviews (lib/reviews-content).
  */
 export function ReviewsSection() {
   const [active, setActive] = useState(0);
@@ -79,7 +79,10 @@ export function ReviewsSection() {
       <Container className="py-10 2xl:py-15">
         <div className="mx-auto mb-10 max-w-2xl text-center">
           <p className="text-sm font-semibold tracking-widest text-brand-500 uppercase">Customer reviews</p>
-          <h2 id="reviews-heading" className="mt-2 font-display text-4xl leading-[1.1] font-medium text-white sm:text-5xl">
+          <h2
+            id="reviews-heading"
+            className="mt-2 font-display text-4xl leading-[1.1] font-medium text-white sm:text-5xl"
+          >
             What our customers <span className="text-brand-500">say</span>
           </h2>
         </div>
@@ -129,8 +132,12 @@ export function ReviewsSection() {
                     {review.name.charAt(0)}
                   </span>
                   <span className="flex min-w-0 flex-col">
-                    <span className="truncate text-lg leading-7 font-bold text-white">{review.name}</span>
-                    <span className="text-[13px] leading-5 text-zinc-400">{review.car}</span>
+                    <span className="truncate text-lg leading-7 font-bold text-white capitalize">
+                      {review.name.toLowerCase()}
+                    </span>
+                    <span className="text-[13px] leading-5 text-zinc-400">
+                      {review.localGuide ? "Local Guide" : "Google review"} · {review.year}
+                    </span>
                   </span>
                 </figcaption>
                 <Stars rating={review.rating} />

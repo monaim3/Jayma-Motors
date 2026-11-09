@@ -38,7 +38,7 @@ function DealerSeal() {
 /** Home: authorized Shell Helix dealer highlight (Jayma's differentiator). */
 export function ShellHelixSection() {
   return (
-    <section aria-labelledby="shell-heading">
+    <section id="shell-helix" aria-labelledby="shell-heading" className="scroll-mt-20">
       <Container className="py-10 2xl:py-15">
         <div className="relative overflow-hidden rounded-[1.5rem] border border-white/10 bg-ink-900/70 px-6 py-12 backdrop-blur-sm sm:px-12 lg:py-16">
           {/* Shell-yellow and brand-red glows */}

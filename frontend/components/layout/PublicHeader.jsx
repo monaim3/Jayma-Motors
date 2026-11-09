@@ -25,7 +25,6 @@ const MEGA_COLUMNS = [
     title: "Discover us",
     links: [
       { href: "/about", label: "About Us" },
-      { href: "/why-us", label: "Why Us" },
       { href: "/gallery", label: "Gallery" },
       { href: "/reviews", label: "Reviews" },
       { href: "/blog", label: "Blog" },
@@ -43,8 +42,7 @@ const MEGA_COLUMNS = [
     links: [
       { href: "/book-appointment", label: "Book Appointment" },
       { href: "/service-enquiry", label: "Service Enquiry" },
-      { href: "/shell-helix", label: "Shell Helix Lubricants" },
-      { href: "/products", label: "Products" },
+      { href: "/products", label: "Products & Lubricants" },
       { href: "/contact", label: "Contact Us" },
     ],
   },
@@ -99,7 +97,13 @@ export function PublicHeader() {
             : "border-b border-transparent bg-transparent",
         )}
       >
-        <Container className="grid h-20 grid-cols-[1fr_auto_1fr] items-center gap-4 lg:h-24">
+        {/* Big logo at the top of the page; shrinks with the bar once scrolled. */}
+        <Container
+          className={cn(
+            "grid grid-cols-[1fr_auto_1fr] items-center gap-4 transition-[height] duration-300",
+            scrolled ? "h-20 lg:h-24" : "h-24 lg:h-28",
+          )}
+        >
           <div className="flex items-center">
             <button
               ref={menuButtonRef}
@@ -116,7 +120,12 @@ export function PublicHeader() {
             </button>
           </div>
 
-          <Logo variant="white" preload className="h-11 lg:h-14" />
+          <Logo
+            variant="white"
+            preload
+            sizes="(min-width: 1024px) 180px, 130px"
+            className={cn("transition-[height] duration-300", scrolled ? "h-11 lg:h-14" : "h-14 lg:h-20")}
+          />
 
           <div className="flex items-center justify-end gap-1 sm:gap-2">
             <p className="mr-3 hidden text-sm text-zinc-200 lg:block">
@@ -274,6 +283,12 @@ export function PublicHeader() {
                 <a href={SITE.phoneHref} className="inline-flex items-center gap-2.5 hover:text-white">
                   <Phone className="size-4 text-brand-500" aria-hidden="true" />
                   {SITE.phone}
+                </a>
+              </li>
+              <li>
+                <a href={SITE.hotlineHref} className="inline-flex items-center gap-2.5 hover:text-white">
+                  <Phone className="size-4 text-brand-500" aria-hidden="true" />
+                  {SITE.hotline} (hotline)
                 </a>
               </li>
               <li>

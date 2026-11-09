@@ -14,7 +14,8 @@ export function ErrorView({ error, retry, className = "py-16" }) {
       <h1 className="text-2xl font-bold">
         {forbidden ? "You don't have access to this page" : "Something went wrong"}
       </h1>
-      <p className="mt-2 max-w-md text-zinc-600">
+      <p class
+      Name="mt-2 max-w-md text-zinc-600">
         {forbidden
           ? "Ask a Super Admin if you need access."
           : `Please try again. If the problem continues, call us at ${SITE.phone}.`}

@@ -205,6 +205,7 @@ Login with wrong credentials → 422 `{ "message": "These credentials do not mat
 | GET | `/appointments/availability` | `from, to` → `{ max_date, closed_dates[], full_dates[] }` |
 | POST | `/appointments` | throttle `public-forms`; Step 2 M2 fields (+ `vehicle_id` when logged in) → 201 `{ reference, status, preferred_date }`; 422 closed/out-of-window date; 409 duplicate booking |
 | POST | `/enquiries` | throttle `public-forms`; Step 2 M3 fields, `service_ids[]` → 201 `{ reference }` |
+| POST | `/contact-messages` | throttle `public-forms`; `name, phone (BD mobile), email?, subject (General question / Price / quote / Feedback / Complaint / Other), message (10–2000)`, honeypot `website` → 201. Emails the workshop. Added 2026-11-09 (U6 changed) |
 | GET | `/redirects` | `path` → `{ new_path }` or 404 |
 
 ---
@@ -264,6 +265,8 @@ Unverified customer calling `/me/service-records*` → **403** `{ "message": "Pl
 | POST | `/admin/enquiries/{id}/status` | `status: contacted|closed` |
 | POST | `/admin/enquiries/{id}/notes` | `note` → 201 |
 | POST | `/admin/enquiries/{id}/convert` | `preferred_date, service_id?` → 201 `{ appointment_id }` |
+| GET | `/admin/contact-messages` | Filters: `status (new|read|replied)`, dates, `search` |
+| POST | `/admin/contact-messages/{id}/status` | `status: read|replied` |
 
 ### 11.4 Customers — `customers.manage`
 
