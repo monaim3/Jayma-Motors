@@ -199,7 +199,13 @@ Standard package tables (`roles`, `permissions`, `model_has_roles`, `model_has_p
 | name | str(120) | required |
 | slug | str(140) | **unique** |
 | short_description | str(300) | nullable |
+| headline | str(150) | nullable — service page headline *(added 2026-11-11, owner approved)* |
 | description | longtext | nullable (rich text, sanitised) |
+| icon | str(40) | nullable — icon name from a fixed list *(added 2026-11-11)* |
+| duration | str(60) | nullable — typical time, e.g. "3–5 hours" *(added 2026-11-11)* |
+| included | json | nullable — list of "What's included" lines *(added 2026-11-11)* |
+| signs | json | nullable — list of "Time to come in if…" lines *(added 2026-11-11)* |
+| faqs | json | nullable — list of `{ q, a }` *(added 2026-11-11)* |
 | image_path | str(255) | nullable |
 | image_alt | str(150) | nullable |
 | is_bookable | bool | default true — appears in appointment/enquiry dropdowns |
@@ -460,7 +466,7 @@ id, name str(120), logo_path str(255), website_url str(255) nullable, is_active 
 | Column | Type | Rules |
 |---|---|---|
 | id | bigint PK | |
-| key | str(40) | **unique**, fixed system key: `about`, `why-us`, `shell-helix`, `terms`, `privacy` |
+| key | str(40) | **unique**, fixed system key: `about`, `terms`, `privacy` (`why-us` and `shell-helix` dropped by the owner 2026-11-09) |
 | title | str(150) | required |
 | slug | str(170) | **unique** |
 | body | longtext | sanitised rich text |

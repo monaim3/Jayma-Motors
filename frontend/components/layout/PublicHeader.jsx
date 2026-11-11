@@ -8,8 +8,8 @@ import { Logo } from "@/components/brand/Logo";
 import { WhatsAppIcon } from "@/components/brand/WhatsAppIcon";
 import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
-import { PUBLIC_NAV, SITE } from "@/lib/constants";
-import { HOME_SERVICES } from "@/lib/home-content";
+import { PUBLIC_NAV } from "@/lib/constants";
+import { FALLBACK_SERVICES, FALLBACK_SITE } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
 function isActive(pathname, href) {
@@ -19,8 +19,8 @@ function isActive(pathname, href) {
 const iconLink =
   "flex size-11 items-center justify-center rounded-full text-white transition-colors hover:bg-white/10 hover:text-brand-500";
 
-/** Laptop mega menu (reference-site style): three titled columns. */
-const MEGA_COLUMNS = [
+/** Laptop mega menu (reference-site style): three titled columns. Services come from the API. */
+const megaColumns = (services) => [
   {
     title: "Discover us",
     links: [
@@ -33,7 +33,7 @@ const MEGA_COLUMNS = [
   {
     title: "Services",
     links: [
-      ...HOME_SERVICES.slice(0, 5).map((service) => ({ href: `/services/${service.slug}`, label: service.name })),
+      ...services.slice(0, 5).map((service) => ({ href: `/services/${service.slug}`, label: service.name })),
       { href: "/services", label: "All Services" },
     ],
   },
@@ -48,7 +48,8 @@ const MEGA_COLUMNS = [
   },
 ];
 
-export function PublicHeader() {
+/** @param site, services - from the public layout (Laravel settings/services, or the built-in copy). */
+export function PublicHeader({ site = FALLBACK_SITE, services = FALLBACK_SERVICES }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -131,14 +132,14 @@ export function PublicHeader() {
             <p className="mr-3 hidden text-sm text-zinc-200 lg:block">
               Call us now:{" "}
               <a
-                href={SITE.phoneHref}
+                href={site.phoneHref}
                 className="font-semibold text-white underline-offset-4 hover:text-brand-500 hover:underline"
               >
-                {SITE.phone}
+                {site.phone}
               </a>
             </p>
             <a
-              href={SITE.whatsappHref}
+              href={site.whatsappHref}
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Chat on WhatsApp"
@@ -189,7 +190,7 @@ export function PublicHeader() {
 
           <nav aria-label="Main" className="flex flex-1 items-center py-10">
             <Container className="grid grid-cols-3 gap-10">
-              {MEGA_COLUMNS.map((column) => (
+              {megaColumns(services).map((column) => (
                 <div key={column.title} className="text-center">
                   <p className="text-lg font-medium tracking-[0.4em] text-white uppercase">{column.title}</p>
                   <div aria-hidden="true" className="mx-auto mt-6 flex max-w-72 items-center gap-4 text-brand-500">
@@ -280,37 +281,41 @@ export function PublicHeader() {
             </div>
             <ul className="space-y-2.5 text-sm text-zinc-300">
               <li>
-                <a href={SITE.phoneHref} className="inline-flex items-center gap-2.5 hover:text-white">
+                <a href={site.phoneHref} className="inline-flex items-center gap-2.5 hover:text-white">
                   <Phone className="size-4 text-brand-500" aria-hidden="true" />
-                  {SITE.phone}
+                  {site.phone}
                 </a>
               </li>
+              {site.hotline && (
+                <li>
+                  <a href={site.hotlineHref} className="inline-flex items-center gap-2.5 hover:text-white">
+                    <Phone className="size-4 text-brand-500" aria-hidden="true" />
+                    {site.hotline} (hotline)
+                  </a>
+                </li>
+              )}
               <li>
-                <a href={SITE.hotlineHref} className="inline-flex items-center gap-2.5 hover:text-white">
-                  <Phone className="size-4 text-brand-500" aria-hidden="true" />
-                  {SITE.hotline} (hotline)
-                </a>
-              </li>
-              <li>
-                <a href={`mailto:${SITE.email}`} className="inline-flex items-center gap-2.5 hover:text-white">
+                <a href={`mailto:${site.email}`} className="inline-flex items-center gap-2.5 hover:text-white">
                   <Mail className="size-4 text-brand-500" aria-hidden="true" />
-                  {SITE.email}
+                  {site.email}
                 </a>
               </li>
               <li className="flex items-start gap-2.5">
                 <MapPin className="mt-0.5 size-4 shrink-0 text-brand-500" aria-hidden="true" />
                 Vatara, Dhaka
               </li>
-              <li>
-                <a
-                  href={SITE.social.facebook}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="font-semibold text-white hover:text-brand-500"
-                >
-                  Facebook
-                </a>
-              </li>
+              {site.social.facebook && (
+                <li>
+                  <a
+                    href={site.social.facebook}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-semibold text-white hover:text-brand-500"
+                  >
+                    Facebook
+                  </a>
+                </li>
+              )}
             </ul>
           </div>
         </div>

@@ -2,24 +2,25 @@ import { ArrowUpRight, CalendarCheck, Clock, MapPin, Navigation, Phone, Siren, T
 import { WhatsAppIcon } from "@/components/brand/WhatsAppIcon";
 import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
+import { getSite } from "@/lib/api/content";
 import { SITE } from "@/lib/constants";
-import { OPENING_HOURS } from "@/lib/home-content";
 import { WorkshopMap3D } from "./WorkshopMap3D";
 
-// Exact coordinates, not a name search: the Google listing's own pin is misplaced (see SITE.geo).
+// Exact coordinates of the owner-marked plot (SITE.geo) rather than a name search.
 const LAT_LNG = `${SITE.geo.lat},${SITE.geo.lng}`;
 const MAP_EMBED = `https://maps.google.com/maps?q=${LAT_LNG}&z=17&output=embed`;
 const DIRECTIONS = `https://www.google.com/maps/dir/?api=1&destination=${LAT_LNG}`;
 
-const QUICK_ACTIONS = [
+/** Emergency and Pick & Drop targets come from the "quick buttons" settings (D8). */
+const quickActions = (site) => [
   {
-    href: SITE.phoneHref,
+    href: site.quickButtons.emergencyHref,
     icon: Siren,
     title: "Emergency help",
     text: "Breakdown? Call us now",
   },
   {
-    href: SITE.whatsappHref,
+    href: site.quickButtons.pickDropHref,
     external: true,
     icon: Truck,
     title: "Pick & Drop",
@@ -32,7 +33,9 @@ const QUICK_ACTIONS = [
  * WhatsApp, Emergency and Pick & Drop — decision D8: they just call or
  * WhatsApp) beside a 3D map with a floating hours + address card.
  */
-export function ContactBand() {
+export async function ContactBand() {
+  const site = await getSite();
+
   return (
     <section aria-labelledby="contact-band-heading">
       <Container className="py-10 2xl:py-15">
@@ -69,7 +72,7 @@ export function ContactBand() {
             </p>
 
             {/* Big call number */}
-            <a href={SITE.phoneHref} className="group mt-8 flex items-center gap-4">
+            <a href={site.phoneHref} className="group mt-8 flex items-center gap-4">
               <span className="relative flex size-14 shrink-0 items-center justify-center">
                 <span
                   aria-hidden="true"
@@ -82,30 +85,38 @@ export function ContactBand() {
               <span>
                 <span className="block text-xs font-semibold tracking-widest text-zinc-500 uppercase">Call us now</span>
                 <span className="block font-display text-3xl font-medium text-white transition-colors group-hover:text-brand-500 sm:text-4xl">
-                  {SITE.phone}
+                  {site.phone}
                 </span>
               </span>
             </a>
-            <p className="mt-3 pl-[4.5rem] text-sm text-zinc-400">
-              Hotline:{" "}
-              <a href={SITE.hotlineHref} className="font-semibold text-white hover:text-brand-500">
-                {SITE.hotline}
-              </a>
-            </p>
+            {site.hotline && (
+              <p className="mt-3 pl-[4.5rem] text-sm text-zinc-400">
+                Hotline:{" "}
+                <a href={site.hotlineHref} className="font-semibold text-white hover:text-brand-500">
+                  {site.hotline}
+                </a>
+              </p>
+            )}
 
             <div className="mt-8 flex flex-wrap gap-3">
               <Button href="#appointment" size="lg" className="shadow-lg shadow-brand-900/50">
                 <CalendarCheck aria-hidden="true" />
                 Book Appointment
               </Button>
-              <Button href={SITE.whatsappHref} target="_blank" rel="noopener noreferrer" size="lg" variant="outline-light">
+              <Button
+                href={site.whatsappHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                size="lg"
+                variant="outline-light"
+              >
                 <WhatsAppIcon className="text-[#25D366]" />
                 WhatsApp
               </Button>
             </div>
 
             <ul className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-1 2xl:grid-cols-2">
-              {QUICK_ACTIONS.map(({ href, external, icon: Icon, title, text }) => (
+              {quickActions(site).map(({ href, external, icon: Icon, title, text }) => (
                 <li key={title}>
                   <a
                     href={href}
@@ -138,13 +149,13 @@ export function ContactBand() {
                 <MapPin className="mt-0.5 size-5 shrink-0 text-brand-500" aria-hidden="true" />
                 <div>
                   <p className="font-bold text-white">Visit the workshop</p>
-                  <address className="mt-1 text-sm text-zinc-400 not-italic">{SITE.address}</address>
+                  <address className="mt-1 text-sm text-zinc-400 not-italic">{site.address}</address>
                 </div>
               </div>
               <div className="mt-4 flex gap-3 border-t border-white/10 pt-4">
                 <Clock className="mt-0.5 size-5 shrink-0 text-brand-500" aria-hidden="true" />
                 <dl className="grid flex-1 gap-1 text-sm">
-                  {OPENING_HOURS.map((row) => (
+                  {site.openingHours.map((row) => (
                     <div key={row.days} className="flex justify-between gap-3">
                       <dt className="text-zinc-400">{row.days}</dt>
                       <dd className="font-semibold text-white">{row.time}</dd>
@@ -152,12 +163,7 @@ export function ContactBand() {
                   ))}
                 </dl>
               </div>
-              <Button
-                href={DIRECTIONS}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-4 w-full"
-              >
+              <Button href={DIRECTIONS} target="_blank" rel="noopener noreferrer" className="mt-4 w-full">
                 <Navigation aria-hidden="true" />
                 Get directions
               </Button>

@@ -6,8 +6,7 @@ import { ServiceCard } from "@/components/features/services/ServiceCard";
 import { PageHero } from "@/components/layout/PageHero";
 import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
-import { SITE } from "@/lib/constants";
-import { HOME_SERVICES } from "@/lib/home-content";
+import { getServices, getSite } from "@/lib/api/content";
 
 export const metadata = {
   title: "Car Services in Dhaka",
@@ -17,10 +16,12 @@ export const metadata = {
 };
 
 /**
- * Services list (Step 5 §6.3). Content comes from the D6 list in
- * lib/home-content until the services API lands (milestone F2/B2).
+ * Services list (Step 5 §6.3). Services and contact details come from Laravel
+ * (GET /services, /settings/public), with the built-in copy as a fallback.
  */
-export default function ServicesPage() {
+export default async function ServicesPage() {
+  const [services, site] = await Promise.all([getServices(), getSite()]);
+
   return (
     <>
       <PageHero
@@ -37,14 +38,14 @@ export default function ServicesPage() {
       <section aria-label="All services">
         <Container className="pb-10 2xl:pb-15">
           <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {HOME_SERVICES.map((service, index) => (
+            {services.map((service, index) => (
               <li key={service.slug}>
                 <ServiceCard service={service} priority={index < 3} />
               </li>
             ))}
 
-            {/* Fills the last grid slot (full width in the 2-column tablet grid): for jobs not listed above. */}
-            <li className="sm:max-lg:col-span-2">
+            {/* Fills the last grid slot (full width when alone in the 2-column tablet grid): for jobs not listed above. */}
+            <li className={services.length % 2 === 0 ? "sm:max-lg:col-span-2" : undefined}>
               <div className="flex h-full flex-col justify-center rounded-card border border-dashed border-brand-500/40 bg-brand-600/[0.06] p-8">
                 <span className="flex size-12 items-center justify-center rounded-full bg-brand-600/15 text-brand-500 ring-1 ring-brand-500/30">
                   <MessageCircleQuestion className="size-6" aria-hidden="true" />
@@ -55,12 +56,12 @@ export default function ServicesPage() {
                   and give you a clear quote.
                 </p>
                 <div className="mt-6 flex flex-wrap gap-3">
-                  <Button href={SITE.phoneHref} size="sm">
+                  <Button href={site.phoneHref} size="sm">
                     <Phone aria-hidden="true" />
                     Call us
                   </Button>
                   <Button
-                    href={SITE.whatsappHref}
+                    href={site.whatsappHref}
                     target="_blank"
                     rel="noopener noreferrer"
                     variant="outline-light"

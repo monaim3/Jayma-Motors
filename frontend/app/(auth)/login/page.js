@@ -1,18 +1,30 @@
 import Link from "next/link";
+import { LoginForm } from "@/components/features/auth/LoginForm";
 
 export const metadata = {
   title: "Log in",
 };
 
-/* Placeholder (F0). The working login form is built in milestone F1. */
+/** Customer login (Step 5 §6.10, milestone F1). Staff use /admin/login. */
 export default function LoginPage() {
   return (
     <div>
-      <h1 className="text-2xl font-bold">Log in to your account</h1>
-      <p className="mt-2 text-sm text-zinc-600">Customer login is being built in the next milestone (F1).</p>
-      <p className="mt-6 text-sm">
-        <Link href="/" className="font-medium text-brand-600 hover:underline">
-          ← Back to home
+      <h1 className="text-3xl font-bold text-ink-900">Log in</h1>
+      <p className="mt-2 text-zinc-600">See your bookings, vehicles and service history.</p>
+
+      <div className="mt-8">
+        <LoginForm />
+      </div>
+
+      <p className="mt-8 text-center text-sm text-zinc-600">
+        New to Jayma Motors?{" "}
+        <Link href="/register" className="font-semibold text-brand-600 hover:underline">
+          Create an account
+        </Link>
+      </p>
+      <p className="mt-3 text-center text-sm">
+        <Link href="/" className="text-zinc-500 hover:text-ink-900">
+          ← Back to website
         </Link>
       </p>
     </div>

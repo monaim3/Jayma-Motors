@@ -2,17 +2,19 @@ import { Mail, MapPin, Phone } from "lucide-react";
 import Link from "next/link";
 import { Logo } from "@/components/brand/Logo";
 import { Container } from "@/components/ui/Container";
-import { FOOTER_LINKS, PUBLIC_NAV, SITE } from "@/lib/constants";
+import { FOOTER_LINKS, PUBLIC_NAV } from "@/lib/constants";
+import { FALLBACK_SITE } from "@/lib/site";
 
-export function PublicFooter() {
+/** @param site - business details from the public layout (Laravel settings). */
+export function PublicFooter({ site = FALLBACK_SITE }) {
   return (
     <footer className="border-t border-white/10 bg-ink-950/60 text-zinc-400 backdrop-blur-sm">
       <Container className="grid gap-10 py-14 sm:grid-cols-2 lg:grid-cols-4">
         <div className="space-y-4">
           <Logo variant="white" className="h-14" />
-          <p className="text-sm leading-relaxed">{SITE.description}</p>
+          <p className="text-sm leading-relaxed">{site.description}</p>
           <p lang="bn" className="text-sm text-zinc-300">
-            {SITE.taglineBn}
+            {site.taglineBn}
           </p>
         </div>
 
@@ -47,24 +49,26 @@ export function PublicFooter() {
           <ul className="space-y-3 text-sm">
             <li className="flex gap-3">
               <MapPin className="mt-0.5 size-4 shrink-0 text-brand-500" aria-hidden="true" />
-              <span>{SITE.address}</span>
+              <span>{site.address}</span>
             </li>
             <li>
-              <a href={SITE.phoneHref} className="flex gap-3 hover:text-white">
+              <a href={site.phoneHref} className="flex gap-3 hover:text-white">
                 <Phone className="mt-0.5 size-4 shrink-0 text-brand-500" aria-hidden="true" />
-                {SITE.phone}
+                {site.phone}
               </a>
             </li>
+            {site.hotline && (
+              <li>
+                <a href={site.hotlineHref} className="flex gap-3 hover:text-white">
+                  <Phone className="mt-0.5 size-4 shrink-0 text-brand-500" aria-hidden="true" />
+                  {site.hotline} <span className="text-zinc-500">(hotline)</span>
+                </a>
+              </li>
+            )}
             <li>
-              <a href={SITE.hotlineHref} className="flex gap-3 hover:text-white">
-                <Phone className="mt-0.5 size-4 shrink-0 text-brand-500" aria-hidden="true" />
-                {SITE.hotline} <span className="text-zinc-500">(hotline)</span>
-              </a>
-            </li>
-            <li>
-              <a href={`mailto:${SITE.email}`} className="flex gap-3 break-all hover:text-white">
+              <a href={`mailto:${site.email}`} className="flex gap-3 break-all hover:text-white">
                 <Mail className="mt-0.5 size-4 shrink-0 text-brand-500" aria-hidden="true" />
-                {SITE.email}
+                {site.email}
               </a>
             </li>
           </ul>
@@ -74,8 +78,8 @@ export function PublicFooter() {
       <div className="border-t border-white/10">
         <Container className="flex flex-col gap-2 py-5 text-xs sm:flex-row sm:items-center sm:justify-between">
           <p>
-            © {SITE.name}. Serving Dhaka since {SITE.since}. Independent multi-brand workshop — not affiliated
-            with any car manufacturer.
+            © {site.name}. Serving Dhaka since {site.since}. Independent multi-brand workshop — not affiliated with any
+            car manufacturer.
           </p>
           <p className="text-zinc-500">
             3D car model:{" "}

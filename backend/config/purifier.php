@@ -31,6 +31,15 @@ return [
             'AutoFormat.AutoParagraph' => true,
             'AutoFormat.RemoveEmpty' => true,
         ],
+        // Rich text from the admin panel (service descriptions, pages, posts): structure only,
+        // no inline styles, scripts or iframes. Links may only be http(s), mailto or tel.
+        'content' => [
+            'HTML.Doctype' => 'HTML 4.01 Transitional',
+            'HTML.Allowed' => 'h2,h3,h4,p,br,strong,b,em,i,u,a[href|title],ul,ol,li,blockquote,img[src|alt|width|height]',
+            'URI.AllowedSchemes' => ['http' => true, 'https' => true, 'mailto' => true, 'tel' => true],
+            'AutoFormat.AutoParagraph' => false,
+            'AutoFormat.RemoveEmpty' => true,
+        ],
         'test' => [
             'Attr.EnableID' => 'true',
         ],

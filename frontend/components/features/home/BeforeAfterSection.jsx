@@ -103,7 +103,13 @@ export function BeforeAfterSection() {
       aria-labelledby="before-after-heading"
       className={cn("relative", reducedMotion ? "" : "h-[260vh]")}
     >
-      <div className={cn("flex flex-col justify-center overflow-hidden", reducedMotion ? "py-10" : "sticky top-0 h-dvh pt-20 lg:pt-24")}>
+      {/* justify-center-safe: if the content is ever taller than the screen, it starts at the top instead of clipping both ends. */}
+      <div
+        className={cn(
+          "flex flex-col justify-center-safe overflow-hidden",
+          reducedMotion ? "py-10" : "sticky top-0 h-dvh pt-20 lg:pt-24",
+        )}
+      >
         {/* Red stage glow behind the car */}
         <div
           aria-hidden="true"
@@ -122,8 +128,9 @@ export function BeforeAfterSection() {
               From muddy to <span className="text-brand-500">mirror shine</span>
             </h2>
 
-            {/* Laptops: the full checklist, lighting up as the car is washed. */}
-            <ol className="mt-6 hidden space-y-3 lg:block">
+            {/* Laptops: the full checklist, lighting up as the car is washed. Short laptop
+                screens (scaled displays) get a compact list, or none, so the button never clips. */}
+            <ol className="mt-6 hidden space-y-3 lg:block [@media(max-height:560px)]:hidden! [@media(max-height:720px)]:mt-4 [@media(max-height:720px)]:space-y-2">
               {DETAIL_STEPS.map((item) => {
                 const done = reveal >= item.at;
                 return (
@@ -139,14 +146,14 @@ export function BeforeAfterSection() {
                     </span>
                     <span className={cn("transition-opacity duration-500", done ? "opacity-100" : "opacity-50")}>
                       <span className="block font-bold text-white">{item.title}</span>
-                      <span className="block text-sm text-zinc-400">{item.text}</span>
+                      <span className="block text-sm text-zinc-400 [@media(max-height:720px)]:hidden">{item.text}</span>
                     </span>
                   </li>
                 );
               })}
             </ol>
 
-            <div className="mt-6 hidden items-center gap-5 lg:flex">
+            <div className="mt-6 hidden items-center gap-5 lg:flex [@media(max-height:720px)]:mt-5">
               <Button href="#book-body-painting-detailing">
                 Book detailing
                 <ArrowRight aria-hidden="true" />
@@ -175,7 +182,7 @@ export function BeforeAfterSection() {
             onKeyDown={onKeyDown}
             // Natural photo shape, never cropped. On laptops it fills the rest of the
             // row, capped so its height fits the pinned screen (ratio 1421/1107 ≈ 1.284).
-            className="relative mt-6 aspect-[1421/1107] w-full cursor-ew-resize touch-pan-y sm:mt-8 lg:mt-0 lg:ml-auto lg:max-w-[calc((100dvh-8rem)*1.284)] lg:flex-1 overflow-hidden rounded-[1.25rem] shadow-2xl ring-1 shadow-black/60 ring-white/15 select-none"
+            className="relative mt-6 aspect-[1421/1107] w-full cursor-ew-resize touch-pan-y overflow-hidden rounded-[1.25rem] shadow-2xl ring-1 shadow-black/60 ring-white/15 select-none sm:mt-8 lg:mt-0 lg:ml-auto lg:max-w-[calc((100dvh-8rem)*1.284)] lg:flex-1"
           >
             <Image
               src="/images/before-after/suv-muddy.webp"

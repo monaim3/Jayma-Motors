@@ -54,10 +54,7 @@ export function ScrollBuiltHero() {
   }, []);
 
   // Reduced motion: the finished car standing still (no drive-off).
-  const getProgress = useCallback(
-    () => (reducedMotion ? HERO_BUILD_END : progressRef.current),
-    [reducedMotion],
-  );
+  const getProgress = useCallback(() => (reducedMotion ? HERO_BUILD_END : progressRef.current), [reducedMotion]);
 
   // The hero tells a story from the top, so a reload starts at the floating parts
   // instead of the browser restoring the previous scroll position mid-animation.
@@ -93,9 +90,7 @@ export function ScrollBuiltHero() {
   const shownStage = reducedMotion ? HERO_STAGES.length - 1 : stageIndex;
   const stage = HERO_STAGES[shownStage];
   // Line-art fallback (no WebGL) steps through the stages.
-  const fallbackProgress = reducedMotion
-    ? HERO_BUILD_END
-    : ((shownStage + 0.5) / HERO_STAGES.length) * HERO_BUILD_END;
+  const fallbackProgress = reducedMotion ? HERO_BUILD_END : ((shownStage + 0.5) / HERO_STAGES.length) * HERO_BUILD_END;
 
   /** Scroll so the given stage is in view (progress rail buttons). */
   const goToStage = (index) => {

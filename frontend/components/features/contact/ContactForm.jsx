@@ -7,7 +7,6 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { api } from "@/lib/api/browser-client";
 import { applyFieldErrors } from "@/lib/api/errors";
-import { SITE } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
 // Same rule as the backend PhoneNumber helper: 01XXXXXXXXX, 8801… or +8801…
@@ -59,7 +58,8 @@ function Field({ id, label, required, error, className, children }) {
  * Contact page message form (owner request 2026-11-09; replaces decision U6).
  * Posts to POST /api/v1/contact-messages (backend milestone B6, with enquiries).
  */
-export function ContactForm() {
+/** @param phone - main number for the "call us instead" error message (from settings). */
+export function ContactForm({ phone }) {
   const {
     register,
     handleSubmit,
@@ -76,7 +76,7 @@ export function ContactForm() {
     } catch (error) {
       if (applyFieldErrors(error, setError)) return;
       toast.error("Couldn't send your message", {
-        description: `Please try again, or call us on ${SITE.phone}.`,
+        description: `Please try again, or call us on ${phone}.`,
       });
     }
   };

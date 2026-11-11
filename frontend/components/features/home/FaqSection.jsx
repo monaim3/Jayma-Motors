@@ -2,7 +2,7 @@ import { MessageCircleQuestion, Plus } from "lucide-react";
 import { WhatsAppIcon } from "@/components/brand/WhatsAppIcon";
 import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
-import { SITE } from "@/lib/constants";
+import { getSite } from "@/lib/api/content";
 import { HOME_FAQS } from "@/lib/home-content";
 
 /** FAQPage structured data so search engines can show the answers. */
@@ -20,7 +20,8 @@ const FAQ_JSON_LD = {
  * Home: frequently asked questions. Native <details> accordions — works
  * without JavaScript and with the keyboard. The first one starts open.
  */
-export function FaqSection() {
+export async function FaqSection() {
+  const site = await getSite();
   return (
     <section aria-labelledby="faq-heading">
       <script
@@ -41,10 +42,16 @@ export function FaqSection() {
             <p className="mt-4 font-bold text-white">Still have a question?</p>
             <p className="mt-1 text-sm text-zinc-400">Talk to our team — we reply quickly on call and WhatsApp.</p>
             <div className="mt-5 flex flex-wrap gap-3">
-              <Button href={SITE.phoneHref} size="sm">
-                Call {SITE.phone}
+              <Button href={site.phoneHref} size="sm">
+                Call {site.phone}
               </Button>
-              <Button href={SITE.whatsappHref} target="_blank" rel="noopener noreferrer" variant="outline-light" size="sm">
+              <Button
+                href={site.whatsappHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                variant="outline-light"
+                size="sm"
+              >
                 <WhatsAppIcon className="size-4" />
                 WhatsApp
               </Button>

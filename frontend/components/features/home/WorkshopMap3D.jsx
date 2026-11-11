@@ -181,7 +181,9 @@ export function WorkshopMap3D({ fallbackSrc, className }) {
             map.setPaintProperty("building-3d", "fill-extrusion-opacity", 0.9);
           }
           // subpixelPositioning: without it the pin snaps to whole pixels each frame and shakes while orbiting.
-          new maplibre.Marker({ element: createPin(), anchor: "bottom", subpixelPositioning: true }).setLngLat(CENTER).addTo(map);
+          new maplibre.Marker({ element: createPin(), anchor: "bottom", subpixelPositioning: true })
+            .setLngLat(CENTER)
+            .addTo(map);
           setReady(true);
 
           const orbit = () => {
@@ -248,10 +250,18 @@ export function WorkshopMap3D({ fallbackSrc, className }) {
   return (
     <div className={cn("relative bg-ink-900", className)}>
       {/* size-full: MapLibre sets position:relative on this element, so inset-0 alone gives it no height. */}
-      <div ref={containerRef} className="absolute inset-0 size-full" aria-label="3D map of the Jayma Motors workshop" role="region" />
+      <div
+        ref={containerRef}
+        className="absolute inset-0 size-full"
+        aria-label="3D map of the Jayma Motors workshop"
+        role="region"
+      />
       {!ready && (
         <div className="absolute inset-0 flex items-center justify-center text-sm text-zinc-500">
-          <span className="size-6 animate-spin rounded-full border-2 border-white/15 border-t-brand-500" aria-hidden="true" />
+          <span
+            className="size-6 animate-spin rounded-full border-2 border-white/15 border-t-brand-500"
+            aria-hidden="true"
+          />
           <span className="sr-only">Loading map</span>
         </div>
       )}
@@ -291,7 +301,13 @@ export function WorkshopMap3D({ fallbackSrc, className }) {
         <button type="button" onClick={() => zoom(1)} aria-label="Zoom in" className={controlClass} disabled={!ready}>
           <Plus className="size-4" aria-hidden="true" />
         </button>
-        <button type="button" onClick={() => zoom(-1)} aria-label="Zoom out" className={cn(controlClass, "border-t border-white/10")} disabled={!ready}>
+        <button
+          type="button"
+          onClick={() => zoom(-1)}
+          aria-label="Zoom out"
+          className={cn(controlClass, "border-t border-white/10")}
+          disabled={!ready}
+        >
           <Minus className="size-4" aria-hidden="true" />
         </button>
         <button
@@ -303,7 +319,13 @@ export function WorkshopMap3D({ fallbackSrc, className }) {
         >
           {is3D ? <MapIcon className="size-4" aria-hidden="true" /> : <Box className="size-4" aria-hidden="true" />}
         </button>
-        <button type="button" onClick={reset} aria-label="Reset view" className={cn(controlClass, "border-t border-white/10")} disabled={!ready}>
+        <button
+          type="button"
+          onClick={reset}
+          aria-label="Reset view"
+          className={cn(controlClass, "border-t border-white/10")}
+          disabled={!ready}
+        >
           <RotateCcw className="size-4" aria-hidden="true" />
         </button>
       </div>

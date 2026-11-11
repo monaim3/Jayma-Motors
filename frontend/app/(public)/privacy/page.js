@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { LegalPage } from "@/components/layout/LegalPage";
+import { getPage } from "@/lib/api/content";
 import { SITE } from "@/lib/constants";
+import { formatLongDate, htmlSections } from "@/lib/site";
 
 export const metadata = {
   title: "Privacy Policy",
@@ -13,6 +15,7 @@ export const metadata = {
  * forms, accounts, service records, cookies). Owner to have it reviewed before
  * launch (Step 10 checklist). Later editable via the pages API (F2).
  */
+/** Built-in copy, shown only if the pages API cannot be reached. */
 const SECTIONS = [
   {
     id: "who",
@@ -34,8 +37,8 @@ const SECTIONS = [
         <p>We only collect what we need to serve you:</p>
         <ul>
           <li>
-            <strong>Contact details</strong> — name, phone number and (optional) email, when you book, send an
-            enquiry, contact us or create an account.
+            <strong>Contact details</strong> — name, phone number and (optional) email, when you book, send an enquiry,
+            contact us or create an account.
           </li>
           <li>
             <strong>Vehicle details</strong> — brand, model, year and registration number.
@@ -89,8 +92,8 @@ const SECTIONS = [
     body: (
       <>
         <p>
-          We use only essential cookies — for example to keep you logged in to your account and to protect forms. We
-          do not use advertising cookies. The map on our site is provided by third parties (Esri, MapTiler and
+          We use only essential cookies — for example to keep you logged in to your account and to protect forms. We do
+          not use advertising cookies. The map on our site is provided by third parties (Esri, MapTiler and
           OpenStreetMap), which may receive your IP address when it loads.
         </p>
       </>
@@ -103,8 +106,8 @@ const SECTIONS = [
       <>
         <p>
           Service records are kept for as long as you are our customer, so your vehicle&apos;s history is available.
-          Enquiries and messages are kept as long as needed to answer them and for our records. You can ask us to
-          delete your information at any time, unless we must keep it by law (for example, invoices).
+          Enquiries and messages are kept as long as needed to answer them and for our records. You can ask us to delete
+          your information at any time, unless we must keep it by law (for example, invoices).
         </p>
       </>
     ),
@@ -115,8 +118,8 @@ const SECTIONS = [
     body: (
       <>
         <p>
-          Our website uses secure (HTTPS) connections, passwords are stored encrypted, and only authorized staff can
-          see customer records.
+          Our website uses secure (HTTPS) connections, passwords are stored encrypted, and only authorized staff can see
+          customer records.
         </p>
       </>
     ),
@@ -128,8 +131,8 @@ const SECTIONS = [
       <>
         <p>
           You can ask to see, correct or delete your information, or stop service reminders, by calling{" "}
-          <a href={SITE.phoneHref}>{SITE.phone}</a> or emailing <a href={`mailto:${SITE.email}`}>{SITE.email}</a>.
-          If you have an account, you can update your profile yourself.
+          <a href={SITE.phoneHref}>{SITE.phone}</a> or emailing <a href={`mailto:${SITE.email}`}>{SITE.email}</a>. If
+          you have an account, you can update your profile yourself.
         </p>
       </>
     ),
@@ -148,14 +151,17 @@ const SECTIONS = [
   },
 ];
 
-export default function PrivacyPage() {
+/** Text comes from the editable page in the admin panel (GET /pages/privacy). */
+export default async function PrivacyPage() {
+  const page = await getPage("privacy");
+
   return (
     <LegalPage
-      title="Privacy Policy"
+      title={page?.title ?? "Privacy Policy"}
       intro="What information we collect, why we need it, and how we keep it safe."
-      updated="9 November 2026"
+      updated={page ? formatLongDate(page.updatedAt) : "9 November 2026"}
       crumb="Privacy Policy"
-      sections={SECTIONS}
+      sections={page ? htmlSections(page.bodyHtml) : SECTIONS}
     />
   );
 }

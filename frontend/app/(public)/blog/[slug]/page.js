@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
 import { BLOG_POSTS, formatPostDate, headingId } from "@/lib/blog-posts";
 import { SITE } from "@/lib/constants";
-import { HOME_SERVICES } from "@/lib/home-content";
+import { getServices, getSite } from "@/lib/api/content";
 
 export function generateStaticParams() {
   return BLOG_POSTS.map((post) => ({ slug: post.slug }));
@@ -96,7 +96,9 @@ export default async function BlogPostPage({ params }) {
   const post = getPost(slug);
   if (!post) notFound();
 
-  const service = HOME_SERVICES.find((item) => item.slug === post.service);
+  const [services, site] = await Promise.all([getServices(), getSite()]);
+  // The related service card hides itself if that service was removed or unpublished.
+  const service = services.find((item) => item.slug === post.service);
   const headings = post.body.filter((block) => block.type === "h2");
   const more = [
     ...BLOG_POSTS.filter((p) => p.slug !== slug && p.category === post.category),
@@ -208,7 +210,7 @@ export default async function BlogPostPage({ params }) {
                   <CalendarCheck aria-hidden="true" />
                   View service
                 </Button>
-                <Button href={SITE.phoneHref} variant="outline-light">
+                <Button href={site.phoneHref} variant="outline-light">
                   <Phone aria-hidden="true" />
                   Call us
                 </Button>

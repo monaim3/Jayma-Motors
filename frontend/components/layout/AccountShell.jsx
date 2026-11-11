@@ -62,12 +62,14 @@ export function AccountShell({ userSlot, children }) {
       <div className="lg:pl-64">
         <header className="sticky top-0 z-30 flex h-16 items-center justify-between gap-4 border-b border-zinc-200 bg-white px-4 sm:px-6">
           <Logo className="h-8 lg:hidden" />
-          <div className="hidden text-sm text-zinc-600 lg:block">{userSlot}</div>
-          <Button href="/book-appointment" size="sm">
-            <CalendarCheck aria-hidden="true" />
-            <span className="hidden sm:inline">Book Appointment</span>
-            <span className="sm:hidden">Book</span>
-          </Button>
+          <div className="ml-auto flex items-center gap-2 sm:gap-4">
+            <div className="text-sm text-zinc-600">{userSlot}</div>
+            <Button href="/book-appointment" size="sm">
+              <CalendarCheck aria-hidden="true" />
+              <span className="hidden sm:inline">Book Appointment</span>
+              <span className="sm:hidden">Book</span>
+            </Button>
+          </div>
         </header>
 
         <main id="main" className="px-4 py-6 pb-24 sm:px-6 lg:pb-8">

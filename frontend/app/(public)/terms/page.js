@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { LegalPage } from "@/components/layout/LegalPage";
+import { getPage } from "@/lib/api/content";
 import { SITE } from "@/lib/constants";
+import { formatLongDate, htmlSections } from "@/lib/site";
 
 export const metadata = {
   title: "Terms & Conditions",
@@ -13,6 +15,7 @@ export const metadata = {
  * reviewed by a lawyer before launch (Step 10 checklist). Later editable via
  * the pages API (F2).
  */
+/** Built-in copy, shown only if the pages API cannot be reached. */
 const SECTIONS = [
   {
     id: "about",
@@ -20,8 +23,8 @@ const SECTIONS = [
     body: (
       <>
         <p>
-          These terms apply when you use the {SITE.name} website or bring your vehicle to our workshop at{" "}
-          {SITE.address}. By booking a service or leaving your vehicle with us, you agree to them.
+          These terms apply when you use the {SITE.name} website or bring your vehicle to our workshop at {SITE.address}
+          . By booking a service or leaving your vehicle with us, you agree to them.
         </p>
         <p>If anything here is unclear, please ask us before work begins.</p>
       </>
@@ -37,8 +40,8 @@ const SECTIONS = [
           our team contacts you. The time is an estimate; busy days or urgent jobs can change it.
         </p>
         <p>
-          Please tell us as early as you can if you need to cancel or change your appointment. Walk-ins are welcome
-          and are served as soon as a bay is free.
+          Please tell us as early as you can if you need to cancel or change your appointment. Walk-ins are welcome and
+          are served as soon as a bay is free.
         </p>
       </>
     ),
@@ -49,8 +52,8 @@ const SECTIONS = [
     body: (
       <>
         <p>
-          We inspect or diagnose your vehicle first and explain what we find. Before any repair we give you a quote,
-          and we <strong>start work only after you approve it</strong>.
+          We inspect or diagnose your vehicle first and explain what we find. Before any repair we give you a quote, and
+          we <strong>start work only after you approve it</strong>.
         </p>
         <ul>
           <li>Diagnosis or inspection may be charged even if you decide not to go ahead with the repair.</li>
@@ -115,8 +118,8 @@ const SECTIONS = [
     body: (
       <>
         <p>
-          If a problem comes back because of our workmanship, bring the vehicle back and we will inspect and correct
-          it. The warranty period depends on the job and is stated on your invoice.
+          If a problem comes back because of our workmanship, bring the vehicle back and we will inspect and correct it.
+          The warranty period depends on the job and is stated on your invoice.
         </p>
         <p>
           The warranty does not cover normal wear, accident damage, misuse, or repairs done elsewhere after our work.
@@ -131,8 +134,8 @@ const SECTIONS = [
       <>
         <p>
           We take good care of every vehicle in our workshop. Where loss or damage is caused by our negligence, we will
-          put it right. We are not responsible for existing faults, wear and tear, or problems that were not part of
-          the work you asked us to do.
+          put it right. We are not responsible for existing faults, wear and tear, or problems that were not part of the
+          work you asked us to do.
         </p>
       </>
     ),
@@ -156,8 +159,8 @@ const SECTIONS = [
       <>
         <p>
           Content on this site (text, photos, videos and the logo) belongs to {SITE.name} or is used with permission.
-          Car brand names and logos belong to their owners and are shown only to say which makes we service; we are
-          an independent workshop, not an official dealer of any manufacturer.
+          Car brand names and logos belong to their owners and are shown only to say which makes we service; we are an
+          independent workshop, not an official dealer of any manufacturer.
         </p>
         <p>
           How we handle your information is explained in our <Link href="/privacy">Privacy Policy</Link>.
@@ -179,14 +182,17 @@ const SECTIONS = [
   },
 ];
 
-export default function TermsPage() {
+/** Text comes from the editable page in the admin panel (GET /pages/terms). */
+export default async function TermsPage() {
+  const page = await getPage("terms");
+
   return (
     <LegalPage
-      title="Terms & Conditions"
+      title={page?.title ?? "Terms & Conditions"}
       intro="The simple rules for booking, repairs and using our website — so we both know what to expect."
-      updated="9 November 2026"
+      updated={page ? formatLongDate(page.updatedAt) : "9 November 2026"}
       crumb="Terms & Conditions"
-      sections={SECTIONS}
+      sections={page ? htmlSections(page.bodyHtml) : SECTIONS}
     />
   );
 }

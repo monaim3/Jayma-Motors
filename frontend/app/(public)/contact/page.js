@@ -7,45 +7,53 @@ import { WorkshopMap3D } from "@/components/features/home/WorkshopMap3D";
 import { PageHero } from "@/components/layout/PageHero";
 import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
+import { getSite } from "@/lib/api/content";
 import { SITE } from "@/lib/constants";
-import { OPENING_HOURS } from "@/lib/home-content";
 
-export const metadata = {
-  title: "Contact Us",
-  description: `Call ${SITE.phone} or ${SITE.hotline}, WhatsApp or visit Jayma Motors in Vatara, Dhaka. Open every day. Book a service or send an enquiry online.`,
-  alternates: { canonical: "/contact" },
-};
+export async function generateMetadata() {
+  const site = await getSite();
+  const numbers = [site.phone, site.hotline].filter(Boolean).join(" or ");
+  return {
+    title: "Contact Us",
+    description: `Call ${numbers}, WhatsApp or visit ${site.name} in Vatara, Dhaka. Book a service or send an enquiry online.`,
+    alternates: { canonical: "/contact" },
+  };
+}
 
 const LAT_LNG = `${SITE.geo.lat},${SITE.geo.lng}`;
 const MAP_EMBED = `https://maps.google.com/maps?q=${LAT_LNG}&z=17&output=embed`;
 const DIRECTIONS = `https://www.google.com/maps/dir/?api=1&destination=${LAT_LNG}`;
 
-const CHANNELS = [
-  {
-    icon: WhatsAppIcon,
-    label: "WhatsApp",
-    value: SITE.phone,
-    href: SITE.whatsappHref,
-    external: true,
-    note: "Send photos of the problem",
-    iconClass: "text-[#25D366]",
-  },
-  { icon: Mail, label: "Email", value: SITE.email, href: `mailto:${SITE.email}`, note: "For quotes and documents" },
-  {
-    icon: FacebookIcon,
-    label: "Facebook",
-    value: "Jayma Motors",
-    href: SITE.social.facebook,
-    external: true,
-    note: "Latest work & offers",
-  },
-];
+/** WhatsApp, email and Facebook cards (Facebook only when a link is set in Settings). */
+const channels = (site) =>
+  [
+    {
+      icon: WhatsAppIcon,
+      label: "WhatsApp",
+      value: site.whatsapp,
+      href: site.whatsappHref,
+      external: true,
+      note: "Send photos of the problem",
+      iconClass: "text-[#25D366]",
+    },
+    { icon: Mail, label: "Email", value: site.email, href: `mailto:${site.email}`, note: "For quotes and documents" },
+    site.social.facebook && {
+      icon: FacebookIcon,
+      label: "Facebook",
+      value: site.name,
+      href: site.social.facebook,
+      external: true,
+      note: "Latest work & offers",
+    },
+  ].filter(Boolean);
 
 /**
  * Contact (Step 5 §6.10): contact cards, message form (owner request
  * 2026-11-09, replacing decision U6), hours, address and the 3D map, FAQ.
  */
-export default function ContactPage() {
+export default async function ContactPage() {
+  const site = await getSite();
+
   return (
     <>
       <PageHero
@@ -74,16 +82,18 @@ export default function ContactPage() {
                   <Phone className="size-5" aria-hidden="true" />
                 </span>
                 <span className="mt-5 text-xs font-semibold tracking-widest text-zinc-500 uppercase">Call us</span>
-                <a href={SITE.phoneHref} className="mt-1 text-lg font-bold text-white hover:text-brand-500">
-                  {SITE.phone}
+                <a href={site.phoneHref} className="mt-1 text-lg font-bold text-white hover:text-brand-500">
+                  {site.phone}
                 </a>
-                <a href={SITE.hotlineHref} className="text-lg font-bold text-white hover:text-brand-500">
-                  {SITE.hotline} <span className="text-sm font-semibold text-zinc-500">hotline</span>
-                </a>
+                {site.hotline && (
+                  <a href={site.hotlineHref} className="text-lg font-bold text-white hover:text-brand-500">
+                    {site.hotline} <span className="text-sm font-semibold text-zinc-500">hotline</span>
+                  </a>
+                )}
                 <span className="mt-1 text-sm text-zinc-400">Fastest for bookings &amp; emergencies</span>
               </div>
             </li>
-            {CHANNELS.map(({ icon: Icon, label, value, href, external, note, iconClass }) => (
+            {channels(site).map(({ icon: Icon, label, value, href, external, note, iconClass }) => (
               <li key={label}>
                 <a
                   href={href}
@@ -134,7 +144,7 @@ export default function ContactPage() {
                 ))}
               </ul>
             </div>
-            <ContactForm />
+            <ContactForm phone={site.phone} />
           </div>
         </Container>
       </section>
@@ -155,7 +165,7 @@ export default function ContactPage() {
                 <MapPin className="mt-0.5 size-5 shrink-0 text-brand-500" aria-hidden="true" />
                 <div>
                   <p className="font-bold text-white">Address</p>
-                  <address className="mt-1 text-zinc-400 not-italic">{SITE.address}</address>
+                  <address className="mt-1 text-zinc-400 not-italic">{site.address}</address>
                 </div>
               </div>
 
@@ -164,7 +174,7 @@ export default function ContactPage() {
                 <div className="flex-1">
                   <p className="font-bold text-white">Opening hours</p>
                   <dl className="mt-1 space-y-1">
-                    {OPENING_HOURS.map((row) => (
+                    {site.openingHours.map((row) => (
                       <div key={row.days} className="flex justify-between gap-4 text-zinc-400">
                         <dt>{row.days}</dt>
                         <dd className="font-semibold text-white">{row.time}</dd>

@@ -9,8 +9,7 @@ import { z } from "zod";
 import { Container } from "@/components/ui/Container";
 import { api } from "@/lib/api/browser-client";
 import { applyFieldErrors } from "@/lib/api/errors";
-import { SITE } from "@/lib/constants";
-import { HOME_SERVICES, VEHICLE_BRANDS } from "@/lib/home-content";
+import { VEHICLE_BRANDS } from "@/lib/home-content";
 import { cn } from "@/lib/utils";
 
 // Same rule as the backend PhoneNumber helper: 01XXXXXXXXX, 8801… or +8801…
@@ -92,7 +91,7 @@ const controlClass =
  * Home appointment form (Step 2 M2), transparent over a dark backdrop.
  * Posts to POST /api/v1/appointments (backend milestone B3).
  */
-export function AppointmentSection() {
+export function AppointmentSection({ services, phone }) {
   const {
     register,
     handleSubmit,
@@ -109,7 +108,7 @@ export function AppointmentSection() {
   useEffect(() => {
     const onHash = () => {
       const slug = window.location.hash.match(/^#book-(.+)$/)?.[1];
-      if (!slug || !HOME_SERVICES.some((service) => service.slug === slug)) return;
+      if (!slug || !services.some((service) => service.slug === slug)) return;
       setValue("service", slug, { shouldValidate: true });
       // Reset the hash so clicking the same card again still fires `hashchange`.
       window.history.replaceState(null, "", "#appointment");
@@ -120,7 +119,7 @@ export function AppointmentSection() {
     onHash();
     window.addEventListener("hashchange", onHash);
     return () => window.removeEventListener("hashchange", onHash);
-  }, [setValue]);
+  }, [setValue, services]);
 
   const onSubmit = async (values) => {
     try {
@@ -134,7 +133,7 @@ export function AppointmentSection() {
     } catch (error) {
       if (applyFieldErrors(error, setError)) return;
       toast.error("Couldn't send your booking", {
-        description: `Please try again, or call us on ${SITE.phone}.`,
+        description: `Please try again, or call us on ${phone}.`,
       });
     }
   };
@@ -239,18 +238,14 @@ export function AppointmentSection() {
               required
               error={errors.registration_number?.message}
             >
-              <input
-                type="text"
-                className={controlClass}
-                {...fieldProps("registration_number")}
-              />
+              <input type="text" className={controlClass} {...fieldProps("registration_number")} />
             </Field>
             <Field id="apt-service" label="Services" icon={Settings} required error={errors.service?.message}>
               <select className={cn(controlClass, "cursor-pointer")} {...fieldProps("service")}>
                 <option value="" className="bg-ink-900">
                   Select service
                 </option>
-                {HOME_SERVICES.map((service) => (
+                {services.map((service) => (
                   <option key={service.slug} value={service.slug} className="bg-ink-900">
                     {service.name}
                   </option>

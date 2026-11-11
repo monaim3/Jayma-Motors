@@ -47,7 +47,7 @@ export function BrandsMarquee() {
       >
         <span
           aria-hidden="true"
-          className="block h-9 w-16 bg-current [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]"
+          className="block h-9 w-16 bg-current [mask-size:contain] [mask-position:center] [mask-repeat:no-repeat]"
           style={{ maskImage: `url(/images/brands/${LOGOS[brand]}.svg)` }}
         />
         <span className="text-sm font-bold tracking-[0.15em] whitespace-nowrap uppercase">{brand}</span>

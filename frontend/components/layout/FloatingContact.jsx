@@ -1,18 +1,18 @@
 import { CalendarCheck, Phone } from "lucide-react";
 import { WhatsAppIcon } from "@/components/brand/WhatsAppIcon";
 import Link from "next/link";
-import { SITE } from "@/lib/constants";
+import { FALLBACK_SITE } from "@/lib/site";
 
 /**
  * WhatsApp + Call buttons (bottom-right) and the sticky "Book Appointment"
  * bar on mobile (Step 5 §4.1).
  */
-export function FloatingContact() {
+export function FloatingContact({ site = FALLBACK_SITE }) {
   return (
     <>
       <div className="fixed right-4 bottom-20 z-30 flex flex-col gap-3 lg:bottom-6">
         <a
-          href={SITE.whatsappHref}
+          href={site.whatsappHref}
           target="_blank"
           rel="noopener noreferrer"
           aria-label="Chat on WhatsApp"
@@ -21,8 +21,8 @@ export function FloatingContact() {
           <WhatsAppIcon className="size-7" />
         </a>
         <a
-          href={SITE.phoneHref}
-          aria-label={`Call ${SITE.phone}`}
+          href={site.phoneHref}
+          aria-label={`Call ${site.phone}`}
           className="flex size-12 items-center justify-center rounded-full bg-brand-600 text-white shadow-lg transition-transform hover:scale-105"
         >
           <Phone className="size-5" aria-hidden="true" />

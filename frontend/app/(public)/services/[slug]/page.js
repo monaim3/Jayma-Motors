@@ -17,41 +17,38 @@ import { ContactBand } from "@/components/features/home/ContactBand";
 import { ServiceCard } from "@/components/features/services/ServiceCard";
 import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
+import { getService, getServices, getSite } from "@/lib/api/content";
 import { SITE } from "@/lib/constants";
-import { HOME_SERVICES } from "@/lib/home-content";
-import { SERVICE_DETAILS } from "@/lib/service-details";
+import { htmlToText } from "@/lib/site";
 
 const PROMISES = ["Clear quote before any work", "Genuine parts & Shell Helix oils", "Certified technicians"];
 
-function getService(slug) {
-  const service = HOME_SERVICES.find((item) => item.slug === slug);
-  const detail = SERVICE_DETAILS[slug];
-  return service && detail ? { ...service, ...detail } : null;
-}
-
-export function generateStaticParams() {
-  return HOME_SERVICES.map(({ slug }) => ({ slug }));
+export async function generateStaticParams() {
+  return (await getServices()).map(({ slug }) => ({ slug }));
 }
 
 export async function generateMetadata({ params }) {
   const { slug } = await params;
-  const service = getService(slug);
+  const service = await getService(slug);
   if (!service) return {};
   return {
-    title: `${service.name} in Dhaka`,
-    description: service.intro,
+    title: service.meta?.title ?? `${service.name} in Dhaka`,
+    description: service.meta?.description ?? htmlToText(service.descriptionHtml),
     alternates: { canonical: `/services/${slug}` },
-    openGraph: { images: [service.photo.src] },
+    openGraph: service.photo ? { images: [service.photo.src] } : undefined,
   };
 }
 
-/** Service detail (Step 5 §6.3): hero, what's included, signs, FAQ, related services, CTA band. */
+/**
+ * Service detail (Step 5 §6.3): hero, what's included, signs, FAQ, related services, CTA band.
+ * Content is edited in the admin panel (GET /services/{slug}); empty sections are hidden.
+ */
 export default async function ServiceDetailPage({ params }) {
   const { slug } = await params;
-  const service = getService(slug);
+  const [service, site] = await Promise.all([getService(slug), getSite()]);
   if (!service) notFound();
 
-  const related = HOME_SERVICES.filter((item) => item.slug !== slug).slice(0, 3);
+  const related = service.related;
   const bookHref = `/#book-${slug}`;
 
   const jsonLd = [
@@ -59,17 +56,17 @@ export default async function ServiceDetailPage({ params }) {
       "@context": "https://schema.org",
       "@type": "Service",
       name: service.name,
-      description: service.intro,
+      description: htmlToText(service.descriptionHtml),
       serviceType: service.name,
       areaServed: { "@type": "City", name: "Dhaka" },
       provider: {
         "@type": "AutoRepair",
-        name: SITE.name,
-        telephone: [SITE.phone, SITE.hotline],
-        address: SITE.address,
+        name: site.name,
+        telephone: [site.phone, site.hotline].filter(Boolean),
+        address: site.address,
       },
     },
-    {
+    service.faqs.length > 0 && {
       "@context": "https://schema.org",
       "@type": "FAQPage",
       mainEntity: service.faqs.map((faq) => ({
@@ -87,7 +84,7 @@ export default async function ServiceDetailPage({ params }) {
         { "@type": "ListItem", position: 3, name: service.name },
       ],
     },
-  ];
+  ].filter(Boolean);
 
   return (
     <>
@@ -129,24 +126,30 @@ export default async function ServiceDetailPage({ params }) {
             <h1 className="mt-2 font-display text-4xl leading-[1.05] font-medium text-white sm:text-5xl">
               {service.headline}
             </h1>
-            <p className="mt-5 text-lg leading-relaxed text-zinc-400">{service.intro}</p>
+            <div
+              className="mt-5 space-y-3 text-lg leading-relaxed text-zinc-400 [&_a]:text-brand-500 [&_strong]:text-white"
+              // Sanitised by Laravel (Purifier, "content" profile).
+              dangerouslySetInnerHTML={{ __html: service.descriptionHtml }}
+            />
 
             <div className="mt-8 flex flex-wrap gap-3">
               <Button href={bookHref} size="lg" className="shadow-lg shadow-brand-900/50">
                 <CalendarCheck aria-hidden="true" />
                 Book this service
               </Button>
-              <Button href={SITE.phoneHref} size="lg" variant="outline-light">
+              <Button href={site.phoneHref} size="lg" variant="outline-light">
                 <Phone aria-hidden="true" />
-                {SITE.phone}
+                {site.phone}
               </Button>
             </div>
 
             <ul className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm text-zinc-300">
-              <li className="flex items-center gap-2">
-                <Clock className="size-4 text-brand-500" aria-hidden="true" />
-                Usually {service.duration}
-              </li>
+              {service.duration && (
+                <li className="flex items-center gap-2">
+                  <Clock className="size-4 text-brand-500" aria-hidden="true" />
+                  Usually {service.duration}
+                </li>
+              )}
               <li className="flex items-center gap-2">
                 <ShieldCheck className="size-4 text-brand-500" aria-hidden="true" />
                 Price agreed before work
@@ -155,55 +158,61 @@ export default async function ServiceDetailPage({ params }) {
           </div>
 
           {/* Our own portrait workshop stills — portrait frame so little is cropped. */}
-          <div className="relative mx-auto aspect-[4/5] w-full max-w-md overflow-hidden rounded-[1.5rem] shadow-2xl ring-1 shadow-black/60 ring-white/15 lg:mr-0 2xl:max-w-lg">
-            <Image
-              src={service.photo.src}
-              alt={service.photo.alt}
-              fill
-              priority
-              quality={90}
-              sizes="(min-width: 1536px) 512px, (min-width: 640px) 448px, 100vw"
-              className="object-cover"
-            />
-            <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-ink-950/50 to-transparent" />
-          </div>
+          {service.photo && (
+            <div className="relative mx-auto aspect-[4/5] w-full max-w-md overflow-hidden rounded-[1.5rem] shadow-2xl ring-1 shadow-black/60 ring-white/15 lg:mr-0 2xl:max-w-lg">
+              <Image
+                src={service.photo.src}
+                alt={service.photo.alt}
+                fill
+                priority
+                quality={90}
+                sizes="(min-width: 1536px) 512px, (min-width: 640px) 448px, 100vw"
+                className="object-cover"
+              />
+              <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-ink-950/50 to-transparent" />
+            </div>
+          )}
         </Container>
       </section>
 
       {/* What's included + when to come in */}
-      <section aria-labelledby="included-heading">
+      <section aria-label="What's included and when to come in">
         <Container className="grid grid-cols-1 items-start gap-6 py-10 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] 2xl:py-15">
-          <div className="rounded-card border border-white/10 bg-white/[0.03] p-6 backdrop-blur-sm sm:p-8">
-            <h2 id="included-heading" className="font-display text-3xl font-medium text-white">
-              What&apos;s <span className="text-brand-500">included</span>
-            </h2>
-            <ul className="mt-6 grid gap-4 sm:grid-cols-2">
-              {service.included.map((item) => (
-                <li key={item} className="flex gap-3">
-                  <span className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-brand-600 text-white">
-                    <Check className="size-3.5" strokeWidth={3} aria-hidden="true" />
-                  </span>
-                  <span className="text-zinc-300">{item}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="flex flex-col gap-6">
-            <div className="rounded-card border border-brand-500/30 bg-brand-600/[0.07] p-6 sm:p-8">
-              <h2 className="flex items-center gap-2 text-lg font-bold text-white">
-                <AlertTriangle className="size-5 text-brand-500" aria-hidden="true" />
-                Time to come in if…
+          {service.included.length > 0 && (
+            <div className="rounded-card border border-white/10 bg-white/[0.03] p-6 backdrop-blur-sm sm:p-8">
+              <h2 id="included-heading" className="font-display text-3xl font-medium text-white">
+                What&apos;s <span className="text-brand-500">included</span>
               </h2>
-              <ul className="mt-4 space-y-2.5">
-                {service.signs.map((sign) => (
-                  <li key={sign} className="flex gap-2.5 text-sm text-zinc-300">
-                    <span className="mt-2 size-1.5 shrink-0 rounded-full bg-brand-500" aria-hidden="true" />
-                    {sign}
+              <ul className="mt-6 grid gap-4 sm:grid-cols-2">
+                {service.included.map((item) => (
+                  <li key={item} className="flex gap-3">
+                    <span className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-brand-600 text-white">
+                      <Check className="size-3.5" strokeWidth={3} aria-hidden="true" />
+                    </span>
+                    <span className="text-zinc-300">{item}</span>
                   </li>
                 ))}
               </ul>
             </div>
+          )}
+
+          <div className="flex flex-col gap-6">
+            {service.signs.length > 0 && (
+              <div className="rounded-card border border-brand-500/30 bg-brand-600/[0.07] p-6 sm:p-8">
+                <h2 className="flex items-center gap-2 text-lg font-bold text-white">
+                  <AlertTriangle className="size-5 text-brand-500" aria-hidden="true" />
+                  Time to come in if…
+                </h2>
+                <ul className="mt-4 space-y-2.5">
+                  {service.signs.map((sign) => (
+                    <li key={sign} className="flex gap-2.5 text-sm text-zinc-300">
+                      <span className="mt-2 size-1.5 shrink-0 rounded-full bg-brand-500" aria-hidden="true" />
+                      {sign}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
             <div className="rounded-card border border-white/10 bg-white/[0.03] p-6 sm:p-8">
               <h2 className="text-lg font-bold text-white">The Jayma promise</h2>
               <ul className="mt-4 space-y-2.5">
@@ -215,7 +224,7 @@ export default async function ServiceDetailPage({ params }) {
                 ))}
               </ul>
               <Button
-                href={SITE.whatsappHref}
+                href={site.whatsappHref}
                 target="_blank"
                 rel="noopener noreferrer"
                 variant="outline-light"
@@ -231,29 +240,31 @@ export default async function ServiceDetailPage({ params }) {
       </section>
 
       {/* FAQ */}
-      <section aria-labelledby="service-faq-heading">
-        <Container className="py-10 2xl:py-15">
-          <h2 id="service-faq-heading" className="font-display text-3xl font-medium text-white sm:text-4xl">
-            Common <span className="text-brand-500">questions</span>
-          </h2>
-          <div className="mt-6 grid gap-3 lg:grid-cols-2">
-            {service.faqs.map((faq) => (
-              <details
-                key={faq.q}
-                className="group h-fit rounded-card border border-white/10 bg-white/[0.03] backdrop-blur-sm open:border-brand-500/40"
-              >
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 p-5 font-bold text-white sm:p-6 [&::-webkit-details-marker]:hidden">
-                  {faq.q}
-                  <span className="flex size-8 shrink-0 items-center justify-center rounded-full border border-white/15 text-brand-500 transition duration-300 group-open:rotate-45 group-open:border-brand-500 group-open:bg-brand-600 group-open:text-white">
-                    <Plus className="size-4" aria-hidden="true" />
-                  </span>
-                </summary>
-                <p className="-mt-1 px-5 pb-5 leading-relaxed text-zinc-400 sm:px-6 sm:pb-6">{faq.a}</p>
-              </details>
-            ))}
-          </div>
-        </Container>
-      </section>
+      {service.faqs.length > 0 && (
+        <section aria-labelledby="service-faq-heading">
+          <Container className="py-10 2xl:py-15">
+            <h2 id="service-faq-heading" className="font-display text-3xl font-medium text-white sm:text-4xl">
+              Common <span className="text-brand-500">questions</span>
+            </h2>
+            <div className="mt-6 grid gap-3 lg:grid-cols-2">
+              {service.faqs.map((faq) => (
+                <details
+                  key={faq.q}
+                  className="group h-fit rounded-card border border-white/10 bg-white/[0.03] backdrop-blur-sm open:border-brand-500/40"
+                >
+                  <summary className="flex cursor-pointer list-none items-center justify-between gap-4 p-5 font-bold text-white sm:p-6 [&::-webkit-details-marker]:hidden">
+                    {faq.q}
+                    <span className="flex size-8 shrink-0 items-center justify-center rounded-full border border-white/15 text-brand-500 transition duration-300 group-open:rotate-45 group-open:border-brand-500 group-open:bg-brand-600 group-open:text-white">
+                      <Plus className="size-4" aria-hidden="true" />
+                    </span>
+                  </summary>
+                  <p className="-mt-1 px-5 pb-5 leading-relaxed text-zinc-400 sm:px-6 sm:pb-6">{faq.a}</p>
+                </details>
+              ))}
+            </div>
+          </Container>
+        </section>
+      )}
 
       {/* Related services */}
       <section aria-labelledby="related-heading">

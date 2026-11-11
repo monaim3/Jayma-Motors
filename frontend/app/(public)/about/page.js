@@ -6,6 +6,7 @@ import { VideoShowcaseSection } from "@/components/features/home/VideoShowcaseSe
 import { PageHero } from "@/components/layout/PageHero";
 import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
+import { getPage } from "@/lib/api/content";
 import { SITE } from "@/lib/constants";
 
 export const metadata = {
@@ -50,7 +51,10 @@ const WORKSHOP_PHOTOS = [
  * (since 2008, Vatara, 60,000 sq ft facility, multi-brand, Shell Helix dealer)
  * — owner to replace with the real story. Later editable via the pages API (F2).
  */
-export default function AboutPage() {
+export default async function AboutPage() {
+  // The story text is editable in the admin panel; the built-in copy shows if the API is down.
+  const about = await getPage("about");
+
   return (
     <>
       <PageHero
@@ -94,24 +98,35 @@ export default function AboutPage() {
 
           <div>
             <p className="text-sm font-semibold tracking-widest text-brand-500 uppercase">Our story</p>
-            <h2 id="story-heading" className="mt-2 font-display text-4xl leading-[1.1] font-medium text-white sm:text-5xl">
+            <h2
+              id="story-heading"
+              className="mt-2 font-display text-4xl leading-[1.1] font-medium text-white sm:text-5xl"
+            >
               Built on trust in <span className="text-brand-500">Vatara</span>
             </h2>
-            <div className="mt-6 space-y-4 leading-relaxed text-zinc-300">
-              <p>
-                Jayma Motors started in {SITE.since} with a simple idea: car owners in Dhaka deserve a workshop that
-                tells them the truth. Find the real fault, explain it clearly, agree the price — then fix it properly.
-              </p>
-              <p>
-                That idea grew into a 60,000 sq ft multi-brand workshop beside Evercare Hospital Road, with computerized
-                diagnosis, a dedicated paint booth and a team of certified technicians who work on everything from
-                daily commuters to luxury cars.
-              </p>
-              <p>
-                As an authorized Shell Helix dealer, we use only genuine, sealed oils — and we treat every car that comes
-                through our gate like our own.
-              </p>
-            </div>
+            {about ? (
+              <div
+                className="mt-6 space-y-4 leading-relaxed text-zinc-300 [&_a]:text-brand-500 [&_strong]:text-white"
+                // Sanitised by Laravel (Purifier, "content" profile).
+                dangerouslySetInnerHTML={{ __html: about.bodyHtml }}
+              />
+            ) : (
+              <div className="mt-6 space-y-4 leading-relaxed text-zinc-300">
+                <p>
+                  Jayma Motors started in {SITE.since} with a simple idea: car owners in Dhaka deserve a workshop that
+                  tells them the truth. Find the real fault, explain it clearly, agree the price — then fix it properly.
+                </p>
+                <p>
+                  That idea grew into a 60,000 sq ft multi-brand workshop beside Evercare Hospital Road, with
+                  computerized diagnosis, a dedicated paint booth and a team of certified technicians who work on
+                  everything from daily commuters to luxury cars.
+                </p>
+                <p>
+                  As an authorized Shell Helix dealer, we use only genuine, sealed oils — and we treat every car that
+                  comes through our gate like our own.
+                </p>
+              </div>
+            )}
 
             <blockquote lang="bn" className="mt-8 border-l-2 border-brand-600 pl-5 text-lg leading-relaxed text-white">
               {SITE.taglineBn}
@@ -134,7 +149,10 @@ export default function AboutPage() {
         <Container className="py-10 2xl:py-15">
           <div className="max-w-2xl">
             <p className="text-sm font-semibold tracking-widest text-brand-500 uppercase">What we stand for</p>
-            <h2 id="values-heading" className="mt-2 font-display text-4xl leading-[1.1] font-medium text-white sm:text-5xl">
+            <h2
+              id="values-heading"
+              className="mt-2 font-display text-4xl leading-[1.1] font-medium text-white sm:text-5xl"
+            >
               Our <span className="text-brand-500">values</span>
             </h2>
           </div>
@@ -160,7 +178,10 @@ export default function AboutPage() {
         <Container className="py-10 2xl:py-15">
           <div className="max-w-2xl">
             <p className="text-sm font-semibold tracking-widest text-brand-500 uppercase">Our workshop</p>
-            <h2 id="inside-heading" className="mt-2 font-display text-4xl leading-[1.1] font-medium text-white sm:text-5xl">
+            <h2
+              id="inside-heading"
+              className="mt-2 font-display text-4xl leading-[1.1] font-medium text-white sm:text-5xl"
+            >
               Where the <span className="text-brand-500">work happens</span>
             </h2>
           </div>
@@ -175,7 +196,10 @@ export default function AboutPage() {
                     sizes="(min-width: 1024px) 25vw, 50vw"
                     className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                   />
-                  <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-ink-950/85 via-transparent to-transparent" />
+                  <div
+                    aria-hidden="true"
+                    className="absolute inset-0 bg-gradient-to-t from-ink-950/85 via-transparent to-transparent"
+                  />
                   <figcaption className="absolute inset-x-0 bottom-0 p-4 text-sm font-bold text-white sm:text-base">
                     {photo.caption}
                   </figcaption>

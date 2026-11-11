@@ -564,7 +564,9 @@ export class CarScene {
       part.node.visible = p >= part.start - 0.005;
       part.node.position.copy(part.basePosition).addScaledVector(part.offset, 1 - t);
       part.node.quaternion.slerpQuaternions(part.startQuaternion, part.baseQuaternion, t);
-      part.node.scale.copy(part.baseScale).multiplyScalar(THREE.MathUtils.lerp(part.minScale, 1, easeOutCubic(clamp(raw * 2))));
+      part.node.scale
+        .copy(part.baseScale)
+        .multiplyScalar(THREE.MathUtils.lerp(part.minScale, 1, easeOutCubic(clamp(raw * 2))));
     }
 
     // Paint: primer grey → metallic red.

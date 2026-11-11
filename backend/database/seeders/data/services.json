@@ -1,0 +1,284 @@
+[
+  {
+    "name": "Engine & Brake Servicing",
+    "slug": "engine-brake-servicing",
+    "icon": "Cog",
+    "short_description": "Engine tune-ups, brake pads, discs and fluid — inspected and serviced properly.",
+    "headline": "Engine & brakes, serviced the right way",
+    "intro": "A healthy engine and sharp brakes keep you safe in Dhaka traffic. We tune the engine, change oils and filters, and inspect every part of the braking system — then show you what we found.",
+    "duration": "3–5 hours",
+    "included": [
+      "Engine oil and filter change with Shell Helix",
+      "Spark plugs, air filter and fuel system check",
+      "Brake pads and discs measured, cleaned or replaced",
+      "Brake fluid test and top-up or flush",
+      "Belts, hoses and coolant inspected",
+      "Test drive and report before handover"
+    ],
+    "signs": [
+      "Squealing or grinding when braking",
+      "Brake pedal feels soft or sinks",
+      "Engine shakes at idle or lacks power",
+      "Higher fuel use than usual"
+    ],
+    "faqs": [
+      {
+        "q": "How often should brakes be checked?",
+        "a": "Every service, or every 10,000 km. In Dhaka's stop-start traffic pads wear faster, so earlier checks are worth it."
+      },
+      {
+        "q": "Do you replace parts without asking?",
+        "a": "Never. We show you the worn part and the price first, and only replace it after you approve."
+      }
+    ],
+    "image_path": "/images/gallery/g123.webp",
+    "image_alt": "Technician working on an engine",
+    "sort_order": 1
+  },
+  {
+    "name": "Computerized Diagnosis",
+    "slug": "computerized-diagnosis",
+    "icon": "Cpu",
+    "short_description": "Scan-tool diagnosis to find faults quickly and fix the real cause.",
+    "headline": "Find the real fault — not a guess",
+    "intro": "Modern cars talk through their computers. We plug in professional scan tools, read fault codes and live sensor data, and pinpoint the cause before a single part is changed.",
+    "duration": "30–60 minutes",
+    "included": [
+      "Full OBD scan of engine, gearbox, ABS and airbag systems",
+      "Live data check of sensors while the engine runs",
+      "Fault codes explained in plain language",
+      "Warning lights cleared after the repair",
+      "Written quote for any repair needed"
+    ],
+    "signs": [
+      "Check-engine or any warning light is on",
+      "Car goes into limp mode or loses power",
+      "Rough idle, stalling or hard starting",
+      "Gear changes feel harsh or delayed"
+    ],
+    "faqs": [
+      {
+        "q": "Can you scan my brand?",
+        "a": "Yes — our tools cover Japanese, Korean and European cars, including hybrids."
+      },
+      {
+        "q": "Will the warning light just come back?",
+        "a": "Not if the cause is fixed. We find the root fault first, so the light stays off."
+      }
+    ],
+    "image_path": "/images/gallery/g15.webp",
+    "image_alt": "Technicians checking a car in our workshop",
+    "sort_order": 2
+  },
+  {
+    "name": "Diagnosis & Repair",
+    "slug": "diagnosis-repair",
+    "icon": "Wrench",
+    "short_description": "Mechanical and electrical repairs for all major car brands.",
+    "headline": "Mechanical & electrical repairs for every brand",
+    "intro": "From suspension knocks to wiring faults and AC problems, our technicians diagnose carefully and repair with genuine or quality parts — explaining the job and the price first.",
+    "duration": "Same day to 2 days",
+    "included": [
+      "Suspension, steering and bush repairs",
+      "Electrical and wiring fault finding",
+      "Starter, alternator and charging system repair",
+      "AC check and gas refill",
+      "Cooling system and radiator repair",
+      "Japanese reconditioned parts on request"
+    ],
+    "signs": [
+      "Knocking over bumps or loose steering",
+      "Lights, windows or locks not working",
+      "AC blowing warm air",
+      "Engine overheating"
+    ],
+    "faqs": [
+      {
+        "q": "Do you use genuine parts?",
+        "a": "Yes, genuine or trusted quality parts. If you prefer reconditioned parts to save cost, we'll tell you the options."
+      },
+      {
+        "q": "How long will my repair take?",
+        "a": "Most repairs are done the same day. If parts need ordering, we tell you the time with the quote."
+      }
+    ],
+    "image_path": "/images/gallery/g18.webp",
+    "image_alt": "Technician using a full tool set under the bonnet",
+    "sort_order": 3
+  },
+  {
+    "name": "Denting & Body Repair",
+    "slug": "denting",
+    "icon": "Hammer",
+    "short_description": "Accident and dent repair that restores your car's original shape.",
+    "headline": "Dents and accident damage, gone",
+    "intro": "Whether it's a parking scrape or accident damage, our denting team pulls, straightens and reshapes panels so your car's lines look factory-fresh again.",
+    "duration": "1–4 days",
+    "included": [
+      "Damage assessment and clear quote",
+      "Panel pulling, straightening and reshaping",
+      "Bumper and plastic repair",
+      "Panel replacement when repair isn't possible",
+      "Primer, paint match and finish",
+      "Insurance claim photos on request"
+    ],
+    "signs": [
+      "Dents, creases or scrapes on panels",
+      "Gaps between panels after a knock",
+      "Cracked or loose bumper"
+    ],
+    "faqs": [
+      {
+        "q": "Will the repaired area match the rest of the car?",
+        "a": "Yes. We colour-match the paint to your car so the repair blends in."
+      },
+      {
+        "q": "Can you help with an insurance claim?",
+        "a": "We can provide photos and an itemised estimate for your insurer."
+      }
+    ],
+    "image_path": "/images/gallery/g24.webp",
+    "image_alt": "Body and fabrication work in our workshop",
+    "sort_order": 4
+  },
+  {
+    "name": "Painting & Detailing",
+    "slug": "body-painting-detailing",
+    "icon": "PaintRoller",
+    "short_description": "Full body painting, polishing and detailing for a showroom finish.",
+    "headline": "A deep, lasting showroom finish",
+    "intro": "From a single panel to a full respray, plus polishing and detailing — we prepare the surface properly and spray in a dust-controlled booth for a finish that lasts.",
+    "duration": "1 day (detailing) – 5 days (full paint)",
+    "included": [
+      "Full body or panel painting with colour matching",
+      "Paint booth spraying for a clean finish",
+      "Machine polishing to remove swirls and dullness",
+      "Wash, clay and decontamination",
+      "Interior vacuum and wipe-down",
+      "Wax or protective coating"
+    ],
+    "signs": [
+      "Faded, dull or peeling paint",
+      "Swirl marks and fine scratches",
+      "Stains or tar on the body"
+    ],
+    "faqs": [
+      {
+        "q": "How long does a full respray take?",
+        "a": "Usually 4–5 days, including preparation, painting, drying and polishing."
+      },
+      {
+        "q": "Is polishing safe for my paint?",
+        "a": "Yes. We use the right pads and compounds for your paint, removing only what's needed."
+      }
+    ],
+    "image_path": "/images/gallery/g73.webp",
+    "image_alt": "Spraying a panel in our paint booth",
+    "sort_order": 5
+  },
+  {
+    "name": "Wheel Alignment & Balancing",
+    "slug": "wheel-alignment",
+    "icon": "CircleDot",
+    "short_description": "Computer alignment and balancing for safer handling and even tyre wear.",
+    "headline": "Drive straight, wear tyres evenly",
+    "intro": "Potholes and speed breakers knock wheels out of line. Our computerised alignment and balancing bring them back to the manufacturer's settings for safer handling and longer tyre life.",
+    "duration": "45–90 minutes",
+    "included": [
+      "Computerised four-wheel alignment",
+      "Wheel balancing for all four wheels",
+      "Tyre pressure and tread check",
+      "Steering and suspension inspection",
+      "Before-and-after alignment report"
+    ],
+    "signs": [
+      "Car pulls to one side",
+      "Steering wheel is off-centre",
+      "Vibration at speed",
+      "Tyres wearing on one edge"
+    ],
+    "faqs": [
+      {
+        "q": "How often should I get an alignment?",
+        "a": "Every 10,000 km, after new tyres, or after a hard hit on a pothole."
+      },
+      {
+        "q": "What's the difference between alignment and balancing?",
+        "a": "Alignment sets the wheel angles so the car drives straight; balancing removes vibration by evening out the weight of each wheel."
+      }
+    ],
+    "image_path": "/images/gallery/g69.webp",
+    "image_alt": "Car raised on the lift for underbody work",
+    "sort_order": 6
+  },
+  {
+    "name": "Routine Maintenance",
+    "slug": "routine-maintenance",
+    "icon": "ClipboardCheck",
+    "short_description": "Oil changes, filters and scheduled servicing by certified technicians.",
+    "headline": "Regular care that prevents big bills",
+    "intro": "Scheduled servicing keeps small problems small. We follow your car's service schedule with genuine Shell Helix oils, fresh filters and a thorough multi-point check.",
+    "duration": "2–3 hours",
+    "included": [
+      "Engine oil change with genuine Shell Helix",
+      "Oil, air and cabin filter replacement",
+      "Fluid levels checked and topped up",
+      "Battery, lights and wipers check",
+      "Multi-point safety inspection",
+      "Service record for your car"
+    ],
+    "signs": [
+      "Service due by date or kilometres",
+      "Oil change light is on",
+      "Engine sounds louder than usual"
+    ],
+    "faqs": [
+      {
+        "q": "How often should I change engine oil?",
+        "a": "Usually every 5,000–10,000 km depending on the oil grade and your car. We'll advise based on your model and driving."
+      },
+      {
+        "q": "Which oil do you use?",
+        "a": "Genuine Shell Helix — we're an authorized dealer, so it's sealed and never diluted."
+      }
+    ],
+    "image_path": "/images/gallery/g45.webp",
+    "image_alt": "Genuine Shell Helix oil being poured during a service",
+    "sort_order": 7
+  },
+  {
+    "name": "Battery Replacement",
+    "slug": "battery-replacement",
+    "icon": "BatteryCharging",
+    "short_description": "Battery testing and replacement for all makes, done on the spot.",
+    "headline": "No more morning no-starts",
+    "intro": "We test your battery and charging system, and if it's time for a new one, fit the right battery for your car on the spot — then make sure the alternator is charging properly.",
+    "duration": "20–40 minutes",
+    "included": [
+      "Battery health and voltage test",
+      "Alternator and charging system check",
+      "Correct battery fitted for your model",
+      "Terminals cleaned and protected",
+      "Old battery taken back"
+    ],
+    "signs": [
+      "Slow or clicking start",
+      "Dim headlights or flickering dash",
+      "Battery older than 2–3 years",
+      "Battery warning light is on"
+    ],
+    "faqs": [
+      {
+        "q": "How long does a car battery last?",
+        "a": "Typically 2–3 years in Dhaka's heat. Short trips and long idle periods shorten it."
+      },
+      {
+        "q": "Can you come to me if my car won't start?",
+        "a": "Call or WhatsApp us with your location — we'll help or arrange pick-up."
+      }
+    ],
+    "image_path": "/images/gallery/g60.webp",
+    "image_alt": "Engine bay check during a service",
+    "sort_order": 8
+  }
+]

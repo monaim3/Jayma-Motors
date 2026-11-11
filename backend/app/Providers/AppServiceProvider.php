@@ -2,10 +2,14 @@
 
 namespace App\Providers;
 
+use App\Models\User;
+use Illuminate\Auth\Notifications\ResetPassword;
+use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password;
@@ -35,6 +39,37 @@ class AppServiceProvider extends ServiceProvider
         });
 
         $this->configureRateLimiting();
+        $this->configureAuthLinks();
+    }
+
+    /**
+     * Verification and reset emails link to the frontend, not the API (Step 7 §6).
+     * The frontend page passes the parameters back to the matching API endpoint.
+     */
+    private function configureAuthLinks(): void
+    {
+        $frontend = rtrim((string) config('app.frontend_url'), '/');
+
+        VerifyEmail::createUrlUsing(function (User $user) use ($frontend) {
+            $signed = URL::temporarySignedRoute(
+                'auth.verification.verify',
+                now()->addMinutes(60),
+                ['id' => $user->getKey(), 'hash' => sha1($user->getEmailForVerification())],
+                absolute: false,
+            );
+            parse_str((string) parse_url($signed, PHP_URL_QUERY), $query);
+
+            return $frontend.'/verify-email?'.http_build_query([
+                'id' => $user->getKey(),
+                'hash' => sha1($user->getEmailForVerification()),
+                ...$query,
+            ]);
+        });
+
+        ResetPassword::createUrlUsing(fn (User $user, string $token) => $frontend.'/reset-password?'.http_build_query([
+            'token' => $token,
+            'email' => $user->getEmailForPasswordReset(),
+        ]));
     }
 
     /**

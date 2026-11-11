@@ -2,12 +2,18 @@ import { FloatingContact } from "@/components/layout/FloatingContact";
 import { LedBackground } from "@/components/layout/LedBackground";
 import { PublicFooter } from "@/components/layout/PublicFooter";
 import { PublicHeader } from "@/components/layout/PublicHeader";
+import { getServices, getSite } from "@/lib/api/content";
 
 // Fine film grain (SVG noise) for the site background.
 const GRAIN =
   "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")";
 
-export default function PublicLayout({ children }) {
+/** Business details and services come from Laravel (cached; built-in copy if the API is down). */
+export default async function PublicLayout({ children }) {
+  const [site, services] = await Promise.all([getSite(), getServices()]);
+  // The header only needs names and links; keep the browser payload small.
+  const menuServices = services.map(({ slug, name }) => ({ slug, name }));
+
   return (
     <div className="relative isolate flex min-h-dvh flex-col bg-ink-950 text-zinc-300">
       {/*
@@ -28,12 +34,12 @@ export default function PublicLayout({ children }) {
       >
         Skip to content
       </a>
-      <PublicHeader />
+      <PublicHeader site={site} services={menuServices} />
       <main id="main" className="flex-1 pb-16 lg:pb-0">
         {children}
       </main>
-      <PublicFooter />
-      <FloatingContact />
+      <PublicFooter site={site} />
+      <FloatingContact site={site} />
     </div>
   );
 }
