@@ -10,7 +10,7 @@ import { getSite } from "@/lib/api/content";
  * @param sections - [{ id, title, body: ReactNode }] (built-in copy) or
  *   [{ id, title, html }] (from the pages API; already sanitised by Laravel)
  */
-export async function LegalPage({ title, intro, updated, crumb, sections }) {
+export async function LegalPage({ title, intro, updated, crumb, sections, note }) {
   const site = await getSite();
 
   return (
@@ -75,6 +75,12 @@ export async function LegalPage({ title, intro, updated, crumb, sections }) {
               </a>
             </div>
           </div>
+
+          {note && (
+            <div className="mt-6 text-xs leading-relaxed text-zinc-500 [&_a]:underline [&_a:hover]:text-white">
+              {note}
+            </div>
+          )}
         </article>
       </Container>
     </>

@@ -33,6 +33,10 @@ const nextConfig = {
       { source: "/why-us", destination: "/about", permanent: true },
       // Temporary: points to /products (Shell Helix category) once that page exists.
       { source: "/shell-helix", destination: "/#shell-helix", permanent: false },
+      // Temporary until these pages are built (booking = B3); remove each line when its page exists.
+      { source: "/book-appointment", destination: "/#appointment", permanent: false },
+      { source: "/service-enquiry", destination: "/contact", permanent: false },
+      { source: "/products", destination: "/#shell-helix", permanent: false },
     ];
   },
 

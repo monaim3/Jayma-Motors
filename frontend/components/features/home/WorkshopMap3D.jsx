@@ -40,7 +40,7 @@ const BUILDING_COLORS = [
   90,
   "#a2221f",
 ];
-const WORKER_URL = "/vendor/maplibre-gl-worker.mjs";
+const WORKER_URL = "/vendor/maplibre-gl-worker.js";
 /** Credits required by the tile/data licences. */
 const ATTRIBUTION = SATELLITE
   ? [

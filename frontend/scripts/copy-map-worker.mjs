@@ -13,5 +13,6 @@ const dist = dirname(require.resolve("maplibre-gl/package.json"));
 const target = join(import.meta.dirname, "..", "public", "vendor");
 
 mkdirSync(target, { recursive: true });
-copyFileSync(join(dist, "dist", "maplibre-gl-worker.mjs"), join(target, "maplibre-gl-worker.mjs"));
+// Saved as .js: some hosts (Hostinger) send .mjs as text/plain, which browsers refuse to run as a worker.
+copyFileSync(join(dist, "dist", "maplibre-gl-worker.mjs"), join(target, "maplibre-gl-worker.js"));
 console.log("Copied maplibre-gl worker to public/vendor");

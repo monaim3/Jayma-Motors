@@ -182,6 +182,29 @@ const SECTIONS = [
   },
 ];
 
+/** Attribution required by the 3D model's CC BY 4.0 licence (home hero). Kept in code, not the editable text. */
+const CREDITS = (
+  <p>
+    Credits: the 3D car on the home page is based on{" "}
+    <a
+      href="https://sketchfab.com/3d-models/2010-mercedes-sls-amg-fa3fd5eeea674f37bb03283f2c53d563"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      “2010 Mercedes SLS AMG”
+    </a>{" "}
+    by{" "}
+    <a href="https://sketchfab.com/Tyler_Dave" target="_blank" rel="noopener noreferrer">
+      Dave Love
+    </a>
+    , licensed under{" "}
+    <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">
+      CC BY 4.0
+    </a>
+    , modified.
+  </p>
+);
+
 /** Text comes from the editable page in the admin panel (GET /pages/terms). */
 export default async function TermsPage() {
   const page = await getPage("terms");
@@ -193,6 +216,7 @@ export default async function TermsPage() {
       updated={page ? formatLongDate(page.updatedAt) : "9 November 2026"}
       crumb="Terms & Conditions"
       sections={page ? htmlSections(page.bodyHtml) : SECTIONS}
+      note={CREDITS}
     />
   );
 }

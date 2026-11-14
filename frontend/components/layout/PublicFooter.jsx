@@ -76,44 +76,11 @@ export function PublicFooter({ site = FALLBACK_SITE }) {
       </Container>
 
       <div className="border-t border-white/10">
-        <Container className="flex flex-col gap-2 py-5 text-xs sm:flex-row sm:items-center sm:justify-between">
+        <Container className="py-5 text-xs">
           <p>
             © {site.name}. Serving Dhaka since {site.since}. Independent multi-brand workshop — not affiliated with any
             car manufacturer.
           </p>
-          <p className="text-zinc-500">
-            3D car model:{" "}
-            <a
-              href="https://sketchfab.com/3d-models/2010-mercedes-sls-amg-fa3fd5eeea674f37bb03283f2c53d563"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline hover:text-white"
-            >
-              “2010 Mercedes SLS AMG”
-            </a>{" "}
-            by{" "}
-            <a
-              href="https://sketchfab.com/Tyler_Dave"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline hover:text-white"
-            >
-              Dave Love
-            </a>
-            ,{" "}
-            <a
-              href="https://creativecommons.org/licenses/by/4.0/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline hover:text-white"
-            >
-              CC BY 4.0
-            </a>
-            , modified.
-          </p>
-          <Link href="/admin/login" className="hover:text-white">
-            Management login
-          </Link>
         </Container>
       </div>
     </footer>
