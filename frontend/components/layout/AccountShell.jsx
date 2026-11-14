@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Logo } from "@/components/brand/Logo";
 import { Button } from "@/components/ui/Button";
-import { ACCOUNT_NAV } from "@/lib/constants";
+import { ACCOUNT_NAV, BOOKING_HREF } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { NAV_ICONS } from "./nav-icons";
 
@@ -64,7 +64,7 @@ export function AccountShell({ userSlot, children }) {
           <Logo className="h-8 lg:hidden" />
           <div className="ml-auto flex items-center gap-2 sm:gap-4">
             <div className="text-sm text-zinc-600">{userSlot}</div>
-            <Button href="/book-appointment" size="sm">
+            <Button href={BOOKING_HREF} size="sm">
               <CalendarCheck aria-hidden="true" />
               <span className="hidden sm:inline">Book Appointment</span>
               <span className="sm:hidden">Book</span>

@@ -34,9 +34,10 @@ const getCanRender3DOnServer = () => true;
  *   every frame, so scrolling doesn't re-render React.
  * @param fallbackProgress - progress for the line-art fallback (updates per stage).
  */
-export function HeroCar3D({ getProgress, fallbackProgress, className }) {
+export function HeroCar3D({ getProgress, getFreeArea, fallbackProgress, className }) {
   const canvasRef = useRef(null);
   const getProgressRef = useRef(getProgress);
+  const getFreeAreaRef = useRef(getFreeArea);
   const [ready, setReady] = useState(false);
   const [showPoster, setShowPoster] = useState(true);
   const supported = useSyncExternalStore(subscribeNoop, canRender3D, getCanRender3DOnServer);
@@ -46,7 +47,8 @@ export function HeroCar3D({ getProgress, fallbackProgress, className }) {
 
   useEffect(() => {
     getProgressRef.current = getProgress;
-  }, [getProgress]);
+    getFreeAreaRef.current = getFreeArea;
+  }, [getProgress, getFreeArea]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -62,6 +64,7 @@ export function HeroCar3D({ getProgress, fallbackProgress, className }) {
       scene = new CarScene(canvas, {
         lowPower,
         getTarget: () => getProgressRef.current(),
+        getFreeArea: () => getFreeAreaRef.current?.(),
         onReady: () => setReady(true),
       });
       if (visible) scene.start();

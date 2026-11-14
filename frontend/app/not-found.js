@@ -1,5 +1,6 @@
 import { Logo } from "@/components/brand/Logo";
 import { Button } from "@/components/ui/Button";
+import { BOOKING_HREF } from "@/lib/constants";
 
 export const metadata = {
   title: "Page not found",
@@ -17,7 +18,7 @@ export default function NotFound() {
         <Button href="/services" variant="outline">
           Our Services
         </Button>
-        <Button href="/book-appointment" variant="outline">
+        <Button href={BOOKING_HREF} variant="outline">
           Book Appointment
         </Button>
       </div>

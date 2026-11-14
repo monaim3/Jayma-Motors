@@ -1,6 +1,7 @@
 import { CalendarCheck, Phone } from "lucide-react";
 import { WhatsAppIcon } from "@/components/brand/WhatsAppIcon";
 import Link from "next/link";
+import { BOOKING_HREF } from "@/lib/constants";
 import { FALLBACK_SITE } from "@/lib/site";
 
 /**
@@ -29,9 +30,9 @@ export function FloatingContact({ site = FALLBACK_SITE }) {
         </a>
       </div>
 
-      <div className="fixed inset-x-0 bottom-0 z-30 border-t border-white/10 bg-ink-950/85 p-3 backdrop-blur-md lg:hidden">
+      <div data-booking-bar className="fixed inset-x-0 bottom-0 z-30 border-t border-white/10 bg-ink-950/85 p-3 backdrop-blur-md lg:hidden">
         <Link
-          href="/book-appointment"
+          href={BOOKING_HREF}
           className="flex h-11 w-full items-center justify-center gap-2 rounded-control bg-brand-600 text-sm font-semibold text-white"
         >
           <CalendarCheck className="size-4" aria-hidden="true" />

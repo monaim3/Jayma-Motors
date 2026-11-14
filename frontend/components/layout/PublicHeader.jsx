@@ -8,7 +8,7 @@ import { Logo } from "@/components/brand/Logo";
 import { WhatsAppIcon } from "@/components/brand/WhatsAppIcon";
 import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
-import { PUBLIC_NAV } from "@/lib/constants";
+import { BOOKING_HREF, PRODUCTS_HREF, PUBLIC_NAV } from "@/lib/constants";
 import { FALLBACK_SERVICES, FALLBACK_SITE } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
@@ -40,9 +40,9 @@ const megaColumns = (services) => [
   {
     title: "Quick links",
     links: [
-      { href: "/book-appointment", label: "Book Appointment" },
+      { href: BOOKING_HREF, label: "Book Appointment" },
       { href: "/service-enquiry", label: "Service Enquiry" },
-      { href: "/products", label: "Products & Lubricants" },
+      { href: PRODUCTS_HREF, label: "Products & Lubricants" },
       { href: "/contact", label: "Contact Us" },
     ],
   },
@@ -270,7 +270,7 @@ export function PublicHeader({ site = FALLBACK_SITE, services = FALLBACK_SERVICE
 
           <div className="space-y-5 border-t border-white/10 px-6 py-6">
             <div className="grid gap-2">
-              <Button href="/book-appointment" className="w-full" onClick={close}>
+              <Button href={BOOKING_HREF} className="w-full" onClick={close}>
                 <CalendarCheck aria-hidden="true" />
                 Book Appointment
               </Button>

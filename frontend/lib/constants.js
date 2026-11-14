@@ -32,11 +32,20 @@ export const SITE = {
   googleWriteReviewUrl: "https://search.google.com/local/writereview?placeid=ChIJEbiRprPHVTcRY_mnWjW2_BA",
 };
 
+/**
+ * Booking link. Until the /book-appointment page exists (B3), it points straight
+ * at the home booking form: a redirect to "/#appointment" loses the #anchor in
+ * client navigation, so the button would do nothing on the home page.
+ */
+export const BOOKING_HREF = "/#appointment";
+/** Same for products: the Shell Helix section until /products is built. */
+export const PRODUCTS_HREF = "/#shell-helix";
+
 export const PUBLIC_NAV = [
   { href: "/", label: "Home" },
   { href: "/about", label: "About" },
   { href: "/services", label: "Services" },
-  { href: "/products", label: "Products" },
+  { href: PRODUCTS_HREF, label: "Products" },
   { href: "/gallery", label: "Gallery" },
   { href: "/blog", label: "Blog" },
   { href: "/reviews", label: "Reviews" },
@@ -46,7 +55,7 @@ export const PUBLIC_NAV = [
 export const FOOTER_LINKS = [
   { href: "/about", label: "About Us" },
   { href: "/service-enquiry", label: "Service Enquiry" },
-  { href: "/book-appointment", label: "Book Appointment" },
+  { href: BOOKING_HREF, label: "Book Appointment" },
   { href: "/terms", label: "Terms & Conditions" },
   { href: "/privacy", label: "Privacy Policy" },
 ];

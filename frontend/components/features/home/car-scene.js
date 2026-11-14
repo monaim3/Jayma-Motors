@@ -101,16 +101,25 @@ const CLEARCOAT_MIN = 0.001;
 const PAINT_ENV = 0.35;
 /** How quickly the car catches up with the scroll position (per second). */
 const SMOOTHING = 7;
+/** Phones: free space below the text on a typical tall phone (fallback when not measured). */
+const PHONE_FREE_AREA = { top: 0.42, bottom: 0.92 };
+/** The car's visual centre sits a little below the camera's aim point. */
+const PHONE_CENTRE_BIAS = 0.06;
 
 export class CarScene {
   /**
    * @param getTarget - returns the current scroll progress (0–1); read every frame,
    *   so scrolling never has to go through React.
+   * @param getFreeArea - phones: returns { top, bottom } (fractions of the canvas
+   *   height) of the space left free by the text and the bottom bar; the car is
+   *   framed inside it, so short screens don't put parts behind the text.
    */
-  constructor(canvas, { onReady, getTarget, lowPower = false } = {}) {
+  constructor(canvas, { onReady, getTarget, getFreeArea, lowPower = false } = {}) {
     this.canvas = canvas;
     this.onReady = onReady;
     this.getTarget = getTarget;
+    this.getFreeArea = getFreeArea;
+    this.freeArea = PHONE_FREE_AREA;
     this.lowPower = lowPower;
     this.target = 0;
     this.progress = 0;
@@ -402,7 +411,9 @@ export class CarScene {
     const portrait = this.camera.aspect < 1;
     const spreadX = portrait ? 1.7 : 1;
     // Desktop: keep the top parts clear of the fixed header.
-    const spreadY = portrait ? 0.55 : 0.78;
+    // Phones: squeeze the floating parts into the free space on short screens.
+    const freeHeight = this.freeArea.bottom - this.freeArea.top;
+    const spreadY = portrait ? 0.55 * Math.min(1, Math.max(0.55, freeHeight / 0.5)) : 0.78;
     const depth = toCamera * (portrait ? 0.62 : 0.7);
 
     for (const part of this.showcase) {
@@ -484,7 +495,13 @@ export class CarScene {
     // The canvas fills the whole hero; shift the car beside the text (desktop)
     // or below it (phones) instead of rendering it in the middle.
     if (width >= 1024) this.camera.setViewOffset(width, height, -width * 0.2, -height * 0.06, width, height);
-    else this.camera.setViewOffset(width, height, 0, -height * 0.11, width, height);
+    else {
+      // Centre the car in the free space below the text (short phones need a bigger shift).
+      this.freeArea = this.getFreeArea?.() ?? PHONE_FREE_AREA;
+      const centre = (this.freeArea.top + this.freeArea.bottom) / 2;
+      const shift = Math.max(0.11, centre - 0.5 - PHONE_CENTRE_BIAS);
+      this.camera.setViewOffset(width, height, 0, -height * shift, width, height);
+    }
     this.camera.updateProjectionMatrix();
     this.layoutShowcase();
     this.needsRender = true;

@@ -32,6 +32,7 @@ function stageAt(progress) {
 export function ScrollBuiltHero() {
   const sectionRef = useRef(null);
   const stickyRef = useRef(null);
+  const textRef = useRef(null);
   // Scroll progress lives in a ref: the 3D scene reads it every frame, so
   // scrolling doesn't re-render React. State changes only when the caption does.
   const progressRef = useRef(0);
@@ -51,6 +52,24 @@ export function ScrollBuiltHero() {
     progressRef.current = next;
     setStageIndex(stageAt(next));
     setAtTop(next < 0.03);
+  }, []);
+
+  /**
+   * Phones: the part of the stage not covered by the text or the sticky
+   * booking bar, as fractions of the stage height. The 3D scene frames the car in it.
+   */
+  const getFreeArea = useCallback(() => {
+    const sticky = stickyRef.current;
+    const text = textRef.current;
+    if (!sticky || !text) return undefined;
+    const stage = sticky.getBoundingClientRect();
+    // Hidden (lg:hidden) bar has no size; then the stage runs to the bottom.
+    const bar = document.querySelector("[data-booking-bar]")?.getBoundingClientRect();
+    const barTop = bar?.height ? bar.top - stage.top : stage.height;
+    return {
+      top: (text.getBoundingClientRect().bottom - stage.top + 24) / stage.height,
+      bottom: Math.min(stage.height, barTop) / stage.height,
+    };
   }, []);
 
   // Reduced motion: the finished car standing still (no drive-off).
@@ -135,7 +154,7 @@ export function ScrollBuiltHero() {
         {/* 3D stage fills the hero; the camera frames the car beside (desktop) or below (phones) the text. */}
         {/* Soft fade at the bottom so the hero flows into the booking form below. */}
         <div className="absolute inset-0 [mask-image:linear-gradient(to_bottom,black_85%,transparent)]">
-          <HeroCar3D getProgress={getProgress} fallbackProgress={fallbackProgress} />
+          <HeroCar3D getProgress={getProgress} getFreeArea={getFreeArea} fallbackProgress={fallbackProgress} />
         </div>
         {/* Keeps the text readable when floating parts drift behind it. */}
         <div
@@ -145,7 +164,7 @@ export function ScrollBuiltHero() {
 
         {/* Top padding clears the fixed header (80px phones, 96px desktop) with breathing room. */}
         <Container className="pointer-events-none relative flex h-full flex-col pt-28 sm:pt-32 lg:justify-center-safe lg:pt-36 lg:pb-12">
-          <div className="pointer-events-auto max-w-md xl:max-w-lg">
+          <div ref={textRef} className="pointer-events-auto max-w-md xl:max-w-lg">
             <p className="text-xs font-semibold tracking-[0.2em] text-brand-500 uppercase sm:text-sm">
               Independent multi-brand workshop · Dhaka · Since {SITE.since}
             </p>
