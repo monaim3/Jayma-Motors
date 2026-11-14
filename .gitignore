@@ -5,3 +5,6 @@ Thumbs.db
 .idea/
 .playwright-mcp/
 *.log
+
+# Local image-enhancing tool weights (not part of the site)
+gfpgan/
