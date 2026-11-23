@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
+import { servicePoster } from "@/lib/service-posters";
 import { cn } from "@/lib/utils";
 
 const AUTOPLAY_MS = 4500;
@@ -183,10 +184,15 @@ export function ServicesSection({ services: items }) {
                       fill
                       priority={!clone && index - count < 3}
                       sizes="(min-width: 1024px) 30vw, (min-width: 640px) 48vw, 82vw"
+                      style={{ objectPosition: servicePoster(service).focus }}
                       className="-z-20 object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-110"
                     />
                     {/* Darkening for readable text; turns slightly red on hover. */}
-                    <div aria-hidden="true" className="absolute inset-0 -z-10 bg-ink-950/45" />
+                    {/* Lighter at the top so the photo reads; darker behind the name and button. */}
+                    <div
+                      aria-hidden="true"
+                      className="absolute inset-0 -z-10 bg-gradient-to-b from-ink-950/10 via-ink-950/35 to-ink-950/55"
+                    />
                     <div
                       aria-hidden="true"
                       className="absolute inset-0 -z-10 bg-gradient-to-t from-brand-900/70 via-brand-900/20 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100"

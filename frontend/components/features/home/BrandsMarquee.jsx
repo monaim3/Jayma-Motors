@@ -57,7 +57,7 @@ export function BrandsMarquee() {
   return (
     <section aria-labelledby="brands-heading">
       <Container className="py-10 2xl:py-15">
-        <div className="flex flex-col gap-6 rounded-card border border-white/10 bg-white/[0.03] px-6 py-6 backdrop-blur-sm lg:flex-row lg:items-center lg:gap-10 lg:py-5">
+        <div className="flex flex-col gap-6 rounded-card border border-white/10 bg-surface px-6 py-6 backdrop-blur-sm lg:flex-row lg:items-center lg:gap-10 lg:py-5">
           <div className="shrink-0 lg:border-r lg:border-white/10 lg:pr-10">
             <p className="text-xs font-semibold tracking-widest text-brand-500 uppercase">Brands we service</p>
             <h2 id="brands-heading" className="mt-1 font-display text-2xl font-medium whitespace-nowrap text-white">

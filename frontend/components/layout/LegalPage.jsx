@@ -19,7 +19,7 @@ export async function LegalPage({ title, intro, updated, crumb, sections, note }
       <Container className="grid gap-10 pb-10 lg:grid-cols-[16rem_minmax(0,1fr)] lg:gap-16 2xl:pb-15">
         <aside className="lg:sticky lg:top-28 lg:self-start">
           <p className="text-sm text-zinc-500">Last updated: {updated}</p>
-          <nav aria-label="On this page" className="mt-4 rounded-card border border-white/10 bg-white/[0.03] p-5">
+          <nav aria-label="On this page" className="mt-4 rounded-card border border-white/10 bg-surface p-5">
             <p className="text-xs font-semibold tracking-widest text-zinc-400 uppercase">On this page</p>
             <ol className="mt-3 space-y-2 text-sm">
               {sections.map((section, index) => (

@@ -31,7 +31,7 @@ export function WhyChooseSection() {
             return (
               <li
                 key={point.title}
-                className="group relative overflow-hidden rounded-card border border-white/10 bg-white/[0.03] p-6 backdrop-blur-sm transition duration-300 hover:-translate-y-1 hover:border-brand-500/40 hover:bg-white/[0.05]"
+                className="group relative overflow-hidden rounded-card border border-white/10 bg-surface p-6 backdrop-blur-sm transition duration-300 hover:-translate-y-1 hover:border-brand-500/40 hover:bg-white/[0.05]"
               >
                 <span className="relative flex size-12 items-center justify-center rounded-full bg-brand-600/15 text-brand-500 ring-1 ring-brand-500/30 transition-colors group-hover:bg-brand-600 group-hover:text-white">
                   <Icon className="size-5" aria-hidden="true" />

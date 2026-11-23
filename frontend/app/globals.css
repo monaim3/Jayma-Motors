@@ -14,8 +14,14 @@
   --color-brand-900: #5d1514;
 
   --color-logo-black: #1f1f1f;
-  --color-ink-900: #18181b;
-  --color-ink-950: #0e0e10;
+  /*
+   * Neutral charcoal instead of near-black #0e0e10 (owner, 2026-11-23: "too dark").
+   * No blue tint: keeps the logo's black/red identity and red text readable.
+   */
+  --color-ink-900: #242428;
+  --color-ink-950: #1a1a1d;
+  /* Raised cards/panels on the charcoal page (depth instead of flat black). */
+  --color-surface: #242428;
 
   --color-success-50: #f0fdf4;
   --color-success-600: #16a34a;
@@ -71,6 +77,8 @@
   --font-heading: var(--font-nunito-sans), ui-sans-serif, system-ui, sans-serif;
   /* Big marketing headings: `font-display font-medium`. */
   --font-display: var(--font-bodoni-moda), Georgia, "Times New Roman", serif;
+  /* Service-card poster headlines only. */
+  --font-poster: var(--font-anton), Impact, "Arial Narrow", sans-serif;
 }
 
 @layer base {

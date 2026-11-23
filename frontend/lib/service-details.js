@@ -6,7 +6,7 @@
  */
 export const SERVICE_DETAILS = {
   "engine-brake-servicing": {
-    photo: { src: "/images/gallery/g123.webp", alt: "Technician working on an engine" },
+    photo: { src: "/images/services/real/engine-brake-servicing.webp", alt: "Two technicians removing the engine cover on a BMW" },
     headline: "Engine & brakes, serviced the right way",
     intro:
       "A healthy engine and sharp brakes keep you safe in Dhaka traffic. We tune the engine, change oils and filters, and inspect every part of the braking system — then show you what we found.",
@@ -37,7 +37,7 @@ export const SERVICE_DETAILS = {
     ],
   },
   "computerized-diagnosis": {
-    photo: { src: "/images/gallery/g15.webp", alt: "Technicians checking a car in our workshop" },
+    photo: { src: "/images/services/real/computerized-diagnosis.webp", alt: "Technician running a computer diagnosis on the scan-tool station" },
     headline: "Find the real fault — not a guess",
     intro:
       "Modern cars talk through their computers. We plug in professional scan tools, read fault codes and live sensor data, and pinpoint the cause before a single part is changed.",
@@ -67,7 +67,7 @@ export const SERVICE_DETAILS = {
     ],
   },
   "diagnosis-repair": {
-    photo: { src: "/images/gallery/g18.webp", alt: "Technician using a full tool set under the bonnet" },
+    photo: { src: "/images/services/real/diagnosis-repair.webp", alt: "Technician repairing a fault in the engine bay" },
     headline: "Mechanical & electrical repairs for every brand",
     intro:
       "From suspension knocks to wiring faults and AC problems, our technicians diagnose carefully and repair with genuine or quality parts — explaining the job and the price first.",
@@ -98,7 +98,7 @@ export const SERVICE_DETAILS = {
     ],
   },
   denting: {
-    photo: { src: "/images/gallery/g24.webp", alt: "Body and fabrication work in our workshop" },
+    photo: { src: "/images/services/real/denting.webp", alt: "Technician repairing a bumper in our body shop" },
     headline: "Dents and accident damage, gone",
     intro:
       "Whether it's a parking scrape or accident damage, our denting team pulls, straightens and reshapes panels so your car's lines look factory-fresh again.",
@@ -128,7 +128,7 @@ export const SERVICE_DETAILS = {
     ],
   },
   "body-painting-detailing": {
-    photo: { src: "/images/gallery/g73.webp", alt: "Spraying a panel in our paint booth" },
+    photo: { src: "/images/services/real/body-painting-detailing.webp", alt: "Painter spraying a panel in our paint booth" },
     headline: "A deep, lasting showroom finish",
     intro:
       "From a single panel to a full respray, plus polishing and detailing — we prepare the surface properly and spray in a dust-controlled booth for a finish that lasts.",
@@ -158,7 +158,7 @@ export const SERVICE_DETAILS = {
     ],
   },
   "wheel-alignment": {
-    photo: { src: "/images/gallery/g69.webp", alt: "Car raised on the lift for underbody work" },
+    photo: { src: "/images/services/real/wheel-alignment.webp", alt: "Alignment clamp fitted to a wheel on our Launch alignment lift" },
     headline: "Drive straight, wear tyres evenly",
     intro:
       "Potholes and speed breakers knock wheels out of line. Our computerised alignment and balancing bring them back to the manufacturer's settings for safer handling and longer tyre life.",
@@ -188,7 +188,7 @@ export const SERVICE_DETAILS = {
     ],
   },
   "routine-maintenance": {
-    photo: { src: "/images/gallery/g45.webp", alt: "Genuine Shell Helix oil being poured during a service" },
+    photo: { src: "/images/services/real/routine-maintenance.webp", alt: "Technician filling fresh engine oil during a service" },
     headline: "Regular care that prevents big bills",
     intro:
       "Scheduled servicing keeps small problems small. We follow your car's service schedule with genuine Shell Helix oils, fresh filters and a thorough multi-point check.",
@@ -218,7 +218,7 @@ export const SERVICE_DETAILS = {
     ],
   },
   "battery-replacement": {
-    photo: { src: "/images/gallery/g60.webp", alt: "Engine bay check during a service" },
+    photo: { src: "/images/services/real/battery-replacement.webp", alt: "Technician lifting a car battery out of the engine bay" },
     headline: "No more morning no-starts",
     intro:
       "We test your battery and charging system, and if it's time for a new one, fit the right battery for your car on the spot — then make sure the alternator is charging properly.",

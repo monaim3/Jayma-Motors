@@ -35,7 +35,7 @@ export async function FaqSection() {
           <h2 id="faq-heading" className="mt-2 font-display text-4xl leading-[1.1] font-medium text-white sm:text-5xl">
             Questions? <span className="text-brand-500">We&apos;ve got answers</span>
           </h2>
-          <div className="mt-8 rounded-card border border-white/10 bg-white/[0.03] p-6 backdrop-blur-sm">
+          <div className="mt-8 rounded-card border border-white/10 bg-surface p-6 backdrop-blur-sm">
             <span className="flex size-11 items-center justify-center rounded-full bg-brand-600/15 text-brand-500 ring-1 ring-brand-500/30">
               <MessageCircleQuestion className="size-5" aria-hidden="true" />
             </span>
@@ -64,7 +64,7 @@ export async function FaqSection() {
             <details
               key={faq.q}
               open={index === 0}
-              className="group rounded-card border border-white/10 bg-white/[0.03] backdrop-blur-sm transition-colors open:border-brand-500/40 open:bg-white/[0.05]"
+              className="group rounded-card border border-white/10 bg-surface backdrop-blur-sm transition-colors open:border-brand-500/40 open:bg-white/[0.05]"
             >
               <summary className="flex cursor-pointer list-none items-center justify-between gap-4 p-5 text-left font-bold text-white sm:p-6 sm:text-lg [&::-webkit-details-marker]:hidden">
                 {faq.q}

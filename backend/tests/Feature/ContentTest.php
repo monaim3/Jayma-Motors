@@ -48,7 +48,7 @@ it('seeds the 8 services and 3 pages as the website shows them', function () {
     expect($brakes->icon)->toBe('Cog')
         ->and($brakes->included)->not->toBeEmpty()
         ->and($brakes->faqs[0])->toHaveKeys(['q', 'a'])
-        ->and($brakes->image_path)->toBe('/images/gallery/g123.webp');
+        ->and($brakes->image_path)->toBe('/images/services/real/engine-brake-servicing.webp');
 
     // Running it again changes nothing.
     $this->seed(ContentSeeder::class);
@@ -65,7 +65,7 @@ it('lists published services in display order, with a bookable filter', function
         ->assertOk()
         ->assertJsonCount(7, 'data')
         ->assertJsonPath('data.0.slug', 'engine-brake-servicing')
-        ->assertJsonPath('data.0.image.url', '/images/gallery/g123.webp')
+        ->assertJsonPath('data.0.image.url', '/images/services/real/engine-brake-servicing.webp')
         ->assertJsonMissingPath('data.0.faqs');
 
     $this->getJson('/api/v1/services?filter[bookable]=1')->assertJsonCount(6, 'data');

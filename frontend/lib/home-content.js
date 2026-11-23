@@ -76,9 +76,9 @@ export const VEHICLE_BRANDS = [
 export const HOME_STATS = [
   // Since 2008. Fixed number (reading the clock breaks static prerendering); bump yearly.
   { value: 18, suffix: "+", label: "Years in service" },
-  { value: 10000, suffix: "+", label: "Cars serviced", placeholder: true },
+  { value: 50, unit: "K", suffix: "+", label: "Cars serviced" },
   { value: 20, suffix: "+", label: "Car brands" },
-  { value: 30, suffix: "+", label: "Expert technicians" },
+  { value: 60, suffix: "+", label: "Expert technicians" },
 ];
 
 /** "Why choose Jayma" points (owner to confirm wording before launch). */

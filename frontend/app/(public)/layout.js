@@ -22,7 +22,7 @@ export default async function PublicLayout({ children }) {
         around the mouse, and film grain. Sections with their own backdrop (the hero) cover it.
       */}
       <div aria-hidden="true" className="pointer-events-none fixed inset-0 -z-10">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_55%_45%_at_88%_8%,rgb(93_21_20/0.45),transparent_70%),radial-gradient(ellipse_50%_40%_at_6%_92%,rgb(93_21_20/0.35),transparent_70%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_55%_45%_at_88%_8%,rgb(93_21_20/0.6),transparent_70%),radial-gradient(ellipse_50%_40%_at_6%_92%,rgb(93_21_20/0.45),transparent_70%)]" />
         <div className="absolute inset-0 bg-[linear-gradient(to_right,rgb(255_255_255/0.035)_1px,transparent_1px),linear-gradient(to_bottom,rgb(255_255_255/0.035)_1px,transparent_1px)] [mask-image:radial-gradient(ellipse_80%_70%_at_50%_45%,black,transparent)] bg-[size:64px_64px]" />
         <LedBackground />
         <div className="absolute inset-0 opacity-[0.07] mix-blend-overlay" style={{ backgroundImage: GRAIN }} />

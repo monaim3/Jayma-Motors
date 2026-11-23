@@ -11,7 +11,7 @@ const format = (value) => Math.round(value).toLocaleString("en-US");
  * Counts up from 0 when scrolled into view. The server renders the final
  * number (readable without JS); the count-up writes straight to the DOM.
  */
-function Counter({ value, suffix }) {
+function Counter({ value, unit, suffix }) {
   const ref = useRef(null);
 
   useEffect(() => {
@@ -47,6 +47,7 @@ function Counter({ value, suffix }) {
       <span ref={ref} className="tabular-nums">
         {format(value)}
       </span>
+      {unit}
       <span className="text-brand-500">{suffix}</span>
     </>
   );
@@ -57,7 +58,7 @@ export function StatsBand() {
   return (
     <section aria-label="Jayma Motors in numbers">
       <Container className="py-6 sm:py-10">
-        <dl className="grid grid-cols-2 overflow-hidden rounded-card border border-white/10 bg-white/[0.03] backdrop-blur-sm lg:grid-cols-4">
+        <dl className="grid grid-cols-2 overflow-hidden rounded-card border border-white/10 bg-surface backdrop-blur-sm lg:grid-cols-4">
           {HOME_STATS.map((stat, index) => (
             <div
               key={stat.label}
@@ -72,7 +73,7 @@ export function StatsBand() {
                 {stat.label}
               </dt>
               <dd className="order-1 font-display text-4xl font-medium text-white sm:text-5xl lg:text-6xl">
-                <Counter value={stat.value} suffix={stat.suffix} />
+                <Counter value={stat.value} unit={stat.unit} suffix={stat.suffix} />
               </dd>
             </div>
           ))}

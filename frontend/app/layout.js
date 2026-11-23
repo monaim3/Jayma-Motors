@@ -1,4 +1,4 @@
-import { Bodoni_Moda, Nunito_Sans } from "next/font/google";
+import { Anton, Bodoni_Moda, Nunito_Sans } from "next/font/google";
 import { Toaster } from "sonner";
 import { SITE } from "@/lib/constants";
 import "./globals.css";
@@ -16,6 +16,16 @@ const bodoniModa = Bodoni_Moda({
   variable: "--font-bodoni-moda",
   subsets: ["latin"],
   display: "swap",
+});
+
+// Poster headlines on the service cards only: bold condensed, like workshop ads.
+// Not preloaded, so other pages don't download it.
+const anton = Anton({
+  variable: "--font-anton",
+  weight: "400",
+  subsets: ["latin"],
+  display: "swap",
+  preload: false,
 });
 
 export const metadata = {
@@ -38,7 +48,7 @@ export const viewport = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={`${nunitoSans.variable} ${bodoniModa.variable}`}>
+    <html lang="en" className={`${nunitoSans.variable} ${bodoniModa.variable} ${anton.variable}`}>
       {/* Browser extensions (e.g. ColorZilla) add attributes to <body>; ignore those mismatches. */}
       <body className="flex min-h-dvh flex-col" suppressHydrationWarning>
         {children}

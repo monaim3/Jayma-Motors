@@ -8,7 +8,7 @@ export const categoryLabel = (slug) => BLOG_CATEGORIES.find((c) => c.slug === sl
 /** Blog card: photo with category pill, date · read time, title, excerpt. The whole card is the link. */
 export function PostCard({ post, priority = false }) {
   return (
-    <article className="group relative flex h-full flex-col overflow-hidden rounded-card border border-white/10 bg-white/[0.03] transition duration-300 hover:-translate-y-1 hover:border-brand-500/40 hover:shadow-[0_18px_40px_rgb(196_41_39/0.18)]">
+    <article className="group relative flex h-full flex-col overflow-hidden rounded-card border border-white/10 bg-surface transition duration-300 hover:-translate-y-1 hover:border-brand-500/40 hover:shadow-[0_18px_40px_rgb(196_41_39/0.18)]">
       <div className="relative aspect-[4/3] overflow-hidden">
         <Image
           src={post.image.src}

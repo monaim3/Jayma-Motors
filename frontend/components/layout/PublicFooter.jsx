@@ -78,8 +78,7 @@ export function PublicFooter({ site = FALLBACK_SITE }) {
       <div className="border-t border-white/10">
         <Container className="py-5 text-xs">
           <p>
-            © {site.name}. Serving Dhaka since {site.since}. Independent multi-brand workshop — not affiliated with any
-            car manufacturer.
+            © {site.name}. Serving Dhaka since {site.since}. Independent multi-brand workshop.
           </p>
         </Container>
       </div>

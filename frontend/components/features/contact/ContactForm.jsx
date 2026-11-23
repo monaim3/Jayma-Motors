@@ -29,7 +29,7 @@ const schema = z.object({
 const EMPTY = { name: "", phone: "", email: "", subject: "", message: "", website: "" };
 
 const inputClass =
-  "w-full rounded-control border bg-white/[0.03] px-4 py-3 text-base text-white transition-colors placeholder:text-zinc-500 focus:border-brand-500 focus:bg-white/[0.06] focus:outline-none [color-scheme:dark]";
+  "w-full rounded-control border bg-surface px-4 py-3 text-base text-white transition-colors placeholder:text-zinc-500 focus:border-brand-500 focus:bg-white/[0.06] focus:outline-none [color-scheme:dark]";
 
 function Field({ id, label, required, error, className, children }) {
   return (

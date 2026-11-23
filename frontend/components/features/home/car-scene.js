@@ -139,7 +139,10 @@ export class CarScene {
       powerPreference: "high-performance",
     });
     // The canvas covers the whole hero, so pixel density is the main GPU cost.
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, lowPower ? 1 : 1.5));
+    // Phones: their 2–3× screens look blurry below 2× and the canvas is small, so
+    // allow 2×. Large screens stay at 1.5×; weak devices (≤4 cores) at most 1.5×.
+    const phone = window.matchMedia("(max-width: 767px)").matches;
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, phone && !lowPower ? 2 : 1.5));
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.renderer.toneMappingExposure = 1.05;
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;

@@ -57,7 +57,8 @@ export function HeroCar3D({ getProgress, getFreeArea, fallbackProgress, classNam
     let scene;
     let cancelled = false;
     let visible = true;
-    const lowPower = window.matchMedia("(max-width: 767px)").matches || (navigator.hardwareConcurrency ?? 8) <= 4;
+    // Weak devices only: phones in general get the sharp render (their screens show blur most).
+    const lowPower = (navigator.hardwareConcurrency ?? 8) <= 4;
 
     import("./car-scene").then(({ CarScene }) => {
       if (cancelled) return;

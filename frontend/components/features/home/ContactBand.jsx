@@ -121,7 +121,7 @@ export async function ContactBand() {
                   <a
                     href={href}
                     {...(external && { target: "_blank", rel: "noopener noreferrer" })}
-                    className="group flex h-full items-center gap-3 rounded-card border border-white/10 bg-white/[0.03] p-4 transition duration-300 hover:-translate-y-0.5 hover:border-brand-500/50 hover:bg-brand-600/10"
+                    className="group flex h-full items-center gap-3 rounded-card border border-white/10 bg-surface p-4 transition duration-300 hover:-translate-y-0.5 hover:border-brand-500/50 hover:bg-brand-600/10"
                   >
                     <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-brand-600/15 text-brand-500 ring-1 ring-brand-500/30 transition-colors group-hover:bg-brand-600 group-hover:text-white">
                       <Icon className="size-5" aria-hidden="true" />
