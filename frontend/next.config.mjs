@@ -51,6 +51,18 @@ const nextConfig = {
           { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
         ],
       },
+      // Static files in public/ (3.5 MB 3D car, photos, videos): let browsers keep
+      // them for a week, then refresh in the background. Names aren't hashed, so a
+      // replaced file shows up within a week (or straight away under a new name).
+      ...["/models/:path*", "/images/:path*", "/videos/:path*", "/brand/:path*"].map((source) => ({
+        source,
+        headers: [{ key: "Cache-Control", value: "public, max-age=604800, stale-while-revalidate=2592000" }],
+      })),
+      // MapLibre worker is re-copied on every install; one day is enough.
+      {
+        source: "/vendor/:path*",
+        headers: [{ key: "Cache-Control", value: "public, max-age=86400" }],
+      },
     ];
   },
 };
