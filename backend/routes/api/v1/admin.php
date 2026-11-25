@@ -1,6 +1,7 @@
 <?php
 
 use App\Enums\Permission;
+use App\Http\Controllers\Api\V1\Admin\AppointmentController;
 use App\Http\Controllers\Api\V1\Admin\HolidayController;
 use App\Http\Controllers\Api\V1\Admin\PageController;
 use App\Http\Controllers\Api\V1\Admin\ServiceController;
@@ -16,6 +17,15 @@ Route::prefix('admin')
     ->name('admin.')
     ->middleware(['auth:sanctum', 'active', 'staff'])
     ->group(function () {
+        Route::middleware('permission:'.Permission::AppointmentsManage->value)->group(function () {
+            Route::apiResource('appointments', AppointmentController::class)->except('destroy');
+            Route::post('/appointments/{appointment}/confirm', [AppointmentController::class, 'confirm'])->name('appointments.confirm');
+            Route::post('/appointments/{appointment}/reschedule', [AppointmentController::class, 'reschedule'])->name('appointments.reschedule');
+            Route::post('/appointments/{appointment}/cancel', [AppointmentController::class, 'cancel'])->name('appointments.cancel');
+            Route::post('/appointments/{appointment}/check-in', [AppointmentController::class, 'checkIn'])->name('appointments.check-in');
+            Route::post('/appointments/{appointment}/no-show', [AppointmentController::class, 'noShow'])->name('appointments.no-show');
+        });
+
         Route::middleware('permission:'.Permission::SettingsManage->value)->group(function () {
             Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
             Route::patch('/settings/{group}', [SettingsController::class, 'update'])

@@ -12,11 +12,13 @@ use App\Services\Support\AuditLogger;
 use App\Services\Support\ReferenceNumberGenerator;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 
 /**
- * Appointment workflow (Step 3 §6, Step 7 §3). B3: booking and cancelling;
- * confirm / reschedule / check-in / no-show follow with the admin endpoints.
+ * Appointment workflow (Step 3 §6, Step 7 §3): book, confirm, reschedule,
+ * cancel, check-in, no-show and the nightly expiry. Only valid transitions
+ * are allowed (409 otherwise); every change is audited.
  */
 final class AppointmentService
 {
@@ -56,9 +58,13 @@ final class AppointmentService
                 throw new ConflictHttpException('You already have a booking for this date.');
             }
 
+            // Staff bookings may be confirmed straight away (Step 3 §6.2).
+            $confirmed = $source === AppointmentSource::Staff && ! empty($data['confirm']);
+            $status = $confirmed ? AppointmentStatus::Confirmed : AppointmentStatus::Pending;
+
             $appointment = Appointment::create([
                 'reference' => $this->references->next(ReferenceNumberGenerator::APPOINTMENT),
-                'customer_id' => $user?->customer?->id,
+                'customer_id' => $data['customer_id'] ?? $user?->customer?->id,
                 'service_id' => $data['service_id'] ?? null,
                 'contact_name' => $data['contact_name'],
                 'contact_phone' => $data['contact_phone'],
@@ -69,13 +75,15 @@ final class AppointmentService
                 'registration_number_normalized' => $registration,
                 'preferred_date' => $date->toDateString(),
                 'notes' => $data['notes'] ?? null,
-                'status' => AppointmentStatus::Pending,
+                'time_note' => $confirmed ? ($data['time_note'] ?? null) : null,
+                'status' => $status,
+                'confirmed_at' => $confirmed ? now() : null,
                 'source' => $source,
                 'created_by' => $source === AppointmentSource::Staff ? $user?->id : null,
             ]);
 
             $this->audit->log('appointment.booked', $appointment, null, [
-                'status' => AppointmentStatus::Pending->value,
+                'status' => $status->value,
                 'preferred_date' => $appointment->preferred_date->toDateString(),
                 'source' => $source->value,
             ]);
@@ -136,5 +144,123 @@ final class AppointmentService
         AppointmentStatusChanged::dispatch($appointment, 'cancelled', $from, $byCustomer);
 
         return $appointment;
+    }
+
+    /** Pending → Confirmed, optionally with a time note such as "10:30 AM". */
+    public function confirm(Appointment $appointment, ?string $timeNote = null): Appointment
+    {
+        $this->assertStatus($appointment, [AppointmentStatus::Pending], 'Only pending bookings can be confirmed.');
+
+        return $this->transition($appointment, 'confirmed', [
+            'status' => AppointmentStatus::Confirmed,
+            'confirmed_at' => now(),
+            'time_note' => $timeNote ?? $appointment->time_note,
+        ]);
+    }
+
+    /** Move a pending or confirmed booking to a new date (status unchanged); reason recorded. */
+    public function reschedule(Appointment $appointment, string $date, string $reason, ?string $timeNote = null): Appointment
+    {
+        $this->assertStatus($appointment, AppointmentStatus::active(), 'Only pending or confirmed bookings can be rescheduled.');
+
+        $newDate = CarbonImmutable::parse($date, config('app.business_timezone'));
+        if ($newDate->toDateString() === $appointment->preferred_date->toDateString()) {
+            throw ValidationException::withMessages(['preferred_date' => 'Choose a different date.']);
+        }
+        $this->rules->assertBookable($newDate);
+
+        return $this->transition($appointment, 'rescheduled', [
+            'preferred_date' => $newDate->toDateString(),
+            'time_note' => $timeNote,
+        ], $reason);
+    }
+
+    /**
+     * Confirmed → Checked-in, from the appointment day. The service record that
+     * check-in opens (Step 3 §6.2) is added with service records (B5).
+     */
+    public function checkIn(Appointment $appointment): Appointment
+    {
+        $this->assertStatus($appointment, [AppointmentStatus::Confirmed], 'Only confirmed bookings can be checked in.');
+        if ($appointment->preferred_date->toDateString() > $this->rules->today()->toDateString()) {
+            throw new ConflictHttpException('Check-in opens on the appointment day. Reschedule it to today first.');
+        }
+
+        return $this->transition($appointment, 'checked_in', ['status' => AppointmentStatus::CheckedIn]);
+    }
+
+    /** Confirmed → No-show, only on or after the appointment date. */
+    public function markNoShow(Appointment $appointment): Appointment
+    {
+        $this->assertStatus($appointment, [AppointmentStatus::Confirmed], 'Only confirmed bookings can be marked as no-show.');
+        if ($appointment->preferred_date->toDateString() > $this->rules->today()->toDateString()) {
+            throw new ConflictHttpException('A booking can only be marked as no-show on or after its date.');
+        }
+
+        return $this->transition($appointment, 'no_show', ['status' => AppointmentStatus::NoShow]);
+    }
+
+    /** Nightly: pending bookings whose date has passed become Expired (Step 3 §6.2). */
+    public function expirePast(): int
+    {
+        $expired = 0;
+
+        Appointment::query()
+            ->where('status', AppointmentStatus::Pending)
+            ->whereDate('preferred_date', '<', $this->rules->today()->toDateString())
+            ->each(function (Appointment $appointment) use (&$expired) {
+                $this->transition($appointment, 'expired', ['status' => AppointmentStatus::Expired], notify: false);
+                $expired++;
+            });
+
+        return $expired;
+    }
+
+    /**
+     * @param  list<AppointmentStatus>  $allowed
+     */
+    private function assertStatus(Appointment $appointment, array $allowed, string $message): void
+    {
+        if (! in_array($appointment->status, $allowed, true)) {
+            throw new ConflictHttpException($message);
+        }
+    }
+
+    /**
+     * Save a change, audit it ("appointment.<action>") and announce it.
+     *
+     * @param  array<string, mixed>  $changes
+     */
+    private function transition(Appointment $appointment, string $action, array $changes, ?string $note = null, bool $notify = true): Appointment
+    {
+        $from = $appointment->status;
+        $fields = array_values(array_diff(array_keys($changes), ['confirmed_at']));
+        $old = self::plain($appointment->only($fields));
+
+        DB::transaction(function () use ($appointment, $action, $changes, $note, $old, $fields) {
+            $appointment->update($changes);
+            $this->audit->log("appointment.{$action}", $appointment, $old, self::plain($appointment->only($fields)), $note);
+        });
+
+        if ($notify) {
+            AppointmentStatusChanged::dispatch($appointment, $action, $from);
+        }
+
+        return $appointment;
+    }
+
+    /**
+     * Enums and dates as plain values for the audit log.
+     *
+     * @param  array<string, mixed>  $values
+     * @return array<string, mixed>
+     */
+    private static function plain(array $values): array
+    {
+        return array_map(fn ($value) => match (true) {
+            $value instanceof \BackedEnum => $value->value,
+            $value instanceof \DateTimeInterface => $value->format('Y-m-d'),
+            default => $value,
+        }, $values);
     }
 }

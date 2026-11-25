@@ -2,6 +2,8 @@
 
 namespace App\Listeners;
 
+use App\Enums\AppointmentSource;
+use App\Enums\AppointmentStatus;
 use App\Events\AppointmentBooked;
 use App\Events\AppointmentStatusChanged;
 use App\Jobs\SendAppointmentEmail;
@@ -13,7 +15,7 @@ use App\Services\Settings\SettingsService;
 /**
  * Appointment emails (Step 7 §4). All sent after the response. Both
  * handle* methods are found by Laravel's event discovery.
- * - Booked: customer (when they gave an email) + workshop alert.
+ * - Booked: customer (when they gave an email) + workshop alert (website bookings only).
  * - Confirmed / rescheduled / cancelled: customer.
  * - Cancelled by the customer: also a workshop alert.
  */
@@ -23,8 +25,13 @@ class SendAppointmentEmails
 
     public function handleBooked(AppointmentBooked $event): void
     {
-        $this->toCustomer($event->appointment, 'booked');
-        $this->toWorkshop($event->appointment, 'new');
+        $appointment = $event->appointment;
+        $this->toCustomer($appointment, $appointment->status === AppointmentStatus::Confirmed ? 'confirmed' : 'booked');
+
+        // Staff entered it themselves (phone / walk-in): no alert needed.
+        if ($appointment->source !== AppointmentSource::Staff) {
+            $this->toWorkshop($appointment, 'new');
+        }
     }
 
     public function handleStatusChanged(AppointmentStatusChanged $event): void
