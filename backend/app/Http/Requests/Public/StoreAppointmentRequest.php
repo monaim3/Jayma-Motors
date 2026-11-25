@@ -54,9 +54,11 @@ class StoreAppointmentRequest extends FormRequest
             ],
             'contact_email' => ['nullable', 'string', 'email', 'max:191'],
             'preferred_date' => ['required', 'date_format:Y-m-d'],
-            'vehicle_brand' => ['required', 'string', 'max:60'],
-            'vehicle_model' => ['required', 'string', 'max:80'],
-            'registration_number' => ['required', 'string', 'min:3', 'max:40'],
+            // A logged-in customer may pick one of their saved cars instead (B4).
+            'vehicle_id' => ['nullable', 'integer'],
+            'vehicle_brand' => ['required_without:vehicle_id', 'nullable', 'string', 'max:60'],
+            'vehicle_model' => ['required_without:vehicle_id', 'nullable', 'string', 'max:80'],
+            'registration_number' => ['required_without:vehicle_id', 'nullable', 'string', 'min:3', 'max:40'],
             'service' => ['required_without:service_id', 'nullable', 'string', 'max:120'],
             'service_id' => ['required_without:service', 'nullable', 'integer'],
             'notes' => ['nullable', 'string', 'max:1000'],
@@ -97,9 +99,9 @@ class StoreAppointmentRequest extends FormRequest
         return [
             'contact_name.required' => 'Please enter your name.',
             'preferred_date.required' => 'Please choose a date.',
-            'vehicle_brand.required' => 'Please choose your car brand.',
-            'vehicle_model.required' => 'Please enter your car model.',
-            'registration_number.required' => 'Please enter your car number.',
+            'vehicle_brand.required_without' => 'Please choose your car brand.',
+            'vehicle_model.required_without' => 'Please enter your car model.',
+            'registration_number.required_without' => 'Please enter your car number.',
             'service.required_without' => 'Please choose a service.',
             'website.max' => 'Your booking could not be sent.',
         ];

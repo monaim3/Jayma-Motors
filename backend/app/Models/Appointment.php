@@ -44,6 +44,12 @@ class Appointment extends Model
         return $this->belongsTo(Customer::class);
     }
 
+    /** @return BelongsTo<Vehicle, $this> */
+    public function vehicle(): BelongsTo
+    {
+        return $this->belongsTo(Vehicle::class);
+    }
+
     /** @return BelongsTo<Service, $this> */
     public function service(): BelongsTo
     {

@@ -8,8 +8,10 @@ use App\Events\AppointmentBooked;
 use App\Events\AppointmentStatusChanged;
 use App\Models\Appointment;
 use App\Models\User;
+use App\Models\Vehicle;
 use App\Services\Support\AuditLogger;
 use App\Services\Support\ReferenceNumberGenerator;
+use App\Services\Vehicles\VehicleService;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -26,6 +28,7 @@ final class AppointmentService
         private readonly BookingRules $rules,
         private readonly ReferenceNumberGenerator $references,
         private readonly AuditLogger $audit,
+        private readonly VehicleService $vehicles,
     ) {}
 
     /**
@@ -39,6 +42,7 @@ final class AppointmentService
      */
     public function book(array $data, ?User $user = null, AppointmentSource $source = AppointmentSource::Website): Appointment
     {
+        $data = $this->withVehicle($data, $user, $source);
         $date = CarbonImmutable::parse($data['preferred_date'], config('app.business_timezone'));
         $this->rules->assertBookable($date);
 
@@ -62,9 +66,16 @@ final class AppointmentService
             $confirmed = $source === AppointmentSource::Staff && ! empty($data['confirm']);
             $status = $confirmed ? AppointmentStatus::Confirmed : AppointmentStatus::Pending;
 
+            // A logged-in customer's new car is saved to their account (Step 3 §6.1).
+            $customer = $source === AppointmentSource::Website ? $user?->customer : null;
+            if ($customer && empty($data['vehicle_id'])) {
+                $data['vehicle_id'] = $this->vehicles->rememberFromBooking($customer, $data)?->id;
+            }
+
             $appointment = Appointment::create([
                 'reference' => $this->references->next(ReferenceNumberGenerator::APPOINTMENT),
                 'customer_id' => $data['customer_id'] ?? $user?->customer?->id,
+                'vehicle_id' => $data['vehicle_id'] ?? null,
                 'service_id' => $data['service_id'] ?? null,
                 'contact_name' => $data['contact_name'],
                 'contact_phone' => $data['contact_phone'],
@@ -94,6 +105,38 @@ final class AppointmentService
         AppointmentBooked::dispatch($appointment);
 
         return $appointment;
+    }
+
+    /**
+     * A chosen saved car fills the vehicle snapshot. Customers may only pick
+     * their own, non-archived cars; staff may pick any car, and the booking is
+     * then linked to its owner unless another customer was chosen.
+     *
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
+    private function withVehicle(array $data, ?User $user, AppointmentSource $source): array
+    {
+        if (empty($data['vehicle_id'])) {
+            return $data;
+        }
+
+        $vehicle = $source === AppointmentSource::Staff
+            ? Vehicle::query()->find($data['vehicle_id'])
+            : $user?->customer?->vehicles()->active()->find($data['vehicle_id']);
+
+        if ($vehicle === null) {
+            throw ValidationException::withMessages(['vehicle_id' => 'Choose one of your saved cars.']);
+        }
+
+        return [
+            ...$data,
+            'vehicle_id' => $vehicle->id,
+            'customer_id' => $data['customer_id'] ?? ($source === AppointmentSource::Staff ? $vehicle->customer_id : null),
+            'vehicle_brand' => $vehicle->brand_name,
+            'vehicle_model' => $vehicle->model,
+            'registration_number' => $vehicle->registration_number,
+        ];
     }
 
     /**

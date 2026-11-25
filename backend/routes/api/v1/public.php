@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\V1\Public\PageController;
 use App\Http\Controllers\Api\V1\Public\RedirectController;
 use App\Http\Controllers\Api\V1\Public\ServiceController;
 use App\Http\Controllers\Api\V1\Public\SettingsController;
+use App\Http\Controllers\Api\V1\Public\VehicleBrandController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -19,6 +20,8 @@ Route::get('/services/{slug}', [ServiceController::class, 'show'])->name('servic
 Route::get('/pages/{key}', PageController::class)->name('pages.show');
 
 Route::get('/redirects', RedirectController::class)->name('redirects.show');
+
+Route::get('/vehicle-brands', VehicleBrandController::class)->name('vehicle-brands.index');
 
 // B3 — booking (Step 7 §9).
 Route::get('/appointments/availability', [AppointmentController::class, 'availability'])->name('appointments.availability');
