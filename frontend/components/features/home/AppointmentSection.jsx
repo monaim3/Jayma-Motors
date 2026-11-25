@@ -134,6 +134,44 @@ export function AppointmentSection({ services, phone }) {
     }
   }, [availability, preferredDate, setError]);
 
+  /**
+   * Logged-in customers (Step 3 §6.1): pre-fill their details and offer their
+   * saved cars. Only tried when a session cookie exists, so guests make no call.
+   */
+  const [myCars, setMyCars] = useState([]);
+  const [chosenCar, setChosenCar] = useState(null);
+  useEffect(() => {
+    if (!document.cookie.includes("XSRF-TOKEN")) return;
+    let cancelled = false;
+    api
+      .get("/auth/me")
+      .then(async ({ data }) => {
+        const user = data.data;
+        if (cancelled || user.type !== "customer") return;
+        const fill = (name, value) => {
+          const input = document.getElementById(`apt-${name}`);
+          if (value && input && !input.value) setValue(name, value);
+        };
+        fill("contact_name", user.name);
+        fill("contact_phone", user.phone?.replace(/^\+88/, ""));
+        fill("contact_email", user.email);
+        const cars = await api.get("/me/vehicles");
+        if (!cancelled) setMyCars(cars.data.data);
+      })
+      .catch(() => {}); // not logged in: the form works as a guest form
+    return () => {
+      cancelled = true;
+    };
+  }, [setValue]);
+
+  const pickCar = (car) => {
+    setChosenCar(car);
+    const brand = VEHICLE_BRANDS.includes(car.brand_name) ? car.brand_name : "Other";
+    setValue("vehicle_brand", brand, { shouldValidate: true });
+    setValue("vehicle_model", car.model, { shouldValidate: true });
+    setValue("registration_number", car.registration_number, { shouldValidate: true });
+  };
+
   // Service cards link to "#book-<slug>": pick that service and bring the form into view.
   useEffect(() => {
     const onHash = () => {
@@ -165,8 +203,19 @@ export function AppointmentSection({ services, phone }) {
     }
     try {
       await ensureCsrfCookie();
-      const { data } = await api.post("/appointments", values);
-      reset(EMPTY);
+      // A saved car that wasn't edited afterwards is sent by id (keeps its exact details).
+      const sameCar =
+        chosenCar &&
+        chosenCar.registration_number.replace(/\W/g, "").toUpperCase() ===
+          values.registration_number.replace(/\W/g, "").toUpperCase();
+      const { data } = await api.post("/appointments", sameCar ? { ...values, vehicle_id: chosenCar.id } : values);
+      reset({
+        ...EMPTY,
+        contact_name: values.contact_name,
+        contact_phone: values.contact_phone,
+        contact_email: values.contact_email,
+      });
+      setChosenCar(null);
       toast.success("Appointment request received", {
         description: data?.data?.reference
           ? `Reference ${data.data.reference}. We'll call you to confirm.`
@@ -218,6 +267,28 @@ export function AppointmentSection({ services, phone }) {
         </h2>
 
         <form onSubmit={handleSubmit(onSubmit)} noValidate>
+          {myCars.length > 0 && (
+            <div className="mb-5 flex flex-wrap items-center gap-2">
+              <span className="text-sm font-semibold tracking-wide text-zinc-300 uppercase">Your cars:</span>
+              {myCars.map((car) => (
+                <button
+                  key={car.id}
+                  type="button"
+                  onClick={() => pickCar(car)}
+                  aria-pressed={chosenCar?.id === car.id}
+                  className={cn(
+                    "inline-flex items-center gap-2 border px-3 py-1.5 text-sm transition-colors",
+                    chosenCar?.id === car.id
+                      ? "border-brand-500 bg-brand-600 text-white"
+                      : "border-white/35 text-zinc-200 hover:border-white/70",
+                  )}
+                >
+                  <Car className="size-4" aria-hidden="true" />
+                  {car.brand_name} {car.model} · {car.registration_number}
+                </button>
+              ))}
+            </div>
+          )}
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-x-4 lg:gap-y-6">
             <Field
               id="apt-contact_name"
