@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\V1\Public\AppointmentController;
 use App\Http\Controllers\Api\V1\Public\PageController;
 use App\Http\Controllers\Api\V1\Public\RedirectController;
 use App\Http\Controllers\Api\V1\Public\ServiceController;
@@ -18,3 +19,9 @@ Route::get('/services/{slug}', [ServiceController::class, 'show'])->name('servic
 Route::get('/pages/{key}', PageController::class)->name('pages.show');
 
 Route::get('/redirects', RedirectController::class)->name('redirects.show');
+
+// B3 — booking (Step 7 §9).
+Route::get('/appointments/availability', [AppointmentController::class, 'availability'])->name('appointments.availability');
+Route::post('/appointments', [AppointmentController::class, 'store'])
+    ->middleware('throttle:public-forms')
+    ->name('appointments.store');

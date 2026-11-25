@@ -6,6 +6,7 @@ use App\Enums\ContentStatus;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
@@ -59,10 +60,16 @@ class Service extends Model
     /**
      * Whether appointments, enquiries or service records point at this service,
      * in which case it can only be unpublished, never deleted (Step 3 §10).
-     * Those tables arrive in B3/B5/B6, which extend this check.
+     * B3 adds appointments; enquiries (B6) and service records (B5) extend this check.
      */
     public function isInUse(): bool
     {
-        return false;
+        return $this->appointments()->exists();
+    }
+
+    /** @return HasMany<Appointment, $this> */
+    public function appointments(): HasMany
+    {
+        return $this->hasMany(Appointment::class);
     }
 }

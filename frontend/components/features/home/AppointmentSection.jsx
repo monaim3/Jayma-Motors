@@ -2,12 +2,12 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CalendarDays, Car, CarFront, CircleUserRound, Hash, LoaderCircle, Mail, Phone, Settings } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 import { Container } from "@/components/ui/Container";
-import { api } from "@/lib/api/browser-client";
+import { api, ensureCsrfCookie } from "@/lib/api/browser-client";
 import { applyFieldErrors } from "@/lib/api/errors";
 import { VEHICLE_BRANDS } from "@/lib/home-content";
 import { cn } from "@/lib/utils";
@@ -101,8 +101,38 @@ export function AppointmentSection({ services, phone }) {
     control,
     formState: { errors, isSubmitting },
   } = useForm({ resolver: zodResolver(schema), defaultValues: EMPTY });
+  const preferredDate = useWatch({ control, name: "preferred_date" });
   // An empty date input shows the browser's "mm/dd/yyyy"; hide it until focused.
-  const dateEmpty = !useWatch({ control, name: "preferred_date" });
+  const dateEmpty = !preferredDate;
+
+  /**
+   * Bookable dates (GET /appointments/availability): first/last day for the
+   * date picker, plus closed and fully booked days. Loaded the first time
+   * the date field is used, so the page itself stays static.
+   */
+  const [availability, setAvailability] = useState(null);
+  const availabilityRequest = useRef(null);
+  const loadAvailability = () => {
+    availabilityRequest.current ??= api
+      .get("/appointments/availability")
+      .then(({ data }) => setAvailability(data.data))
+      .catch(() => {
+        availabilityRequest.current = null; // the server still checks on submit
+      });
+  };
+
+  // A browser date picker can't grey out single days, so say so as soon as one is picked.
+  useEffect(() => {
+    if (!availability || !preferredDate) return;
+    if (availability.closed_dates.includes(preferredDate)) {
+      setError("preferred_date", {
+        type: "closed",
+        message: "The workshop is closed on this day. Please choose another date.",
+      });
+    } else if (availability.full_dates.includes(preferredDate)) {
+      setError("preferred_date", { type: "full", message: "This day is fully booked. Please choose another date." });
+    }
+  }, [availability, preferredDate, setError]);
 
   // Service cards link to "#book-<slug>": pick that service and bring the form into view.
   useEffect(() => {
@@ -122,7 +152,19 @@ export function AppointmentSection({ services, phone }) {
   }, [setValue, services]);
 
   const onSubmit = async (values) => {
+    if (
+      availability?.closed_dates.includes(values.preferred_date) ||
+      availability?.full_dates.includes(values.preferred_date)
+    ) {
+      setError(
+        "preferred_date",
+        { type: "unavailable", message: "Please choose another date." },
+        { shouldFocus: true },
+      );
+      return;
+    }
     try {
+      await ensureCsrfCookie();
       const { data } = await api.post("/appointments", values);
       reset(EMPTY);
       toast.success("Appointment request received", {
@@ -132,6 +174,11 @@ export function AppointmentSection({ services, phone }) {
       });
     } catch (error) {
       if (applyFieldErrors(error, setError)) return;
+      // 409: the same car is already booked for that day (or too many tries: 429).
+      if (error?.status === 409 || error?.status === 429) {
+        toast.error(error.message, { description: `Questions? Call us on ${phone}.` });
+        return;
+      }
       toast.error("Couldn't send your booking", {
         description: `Please try again, or call us on ${phone}.`,
       });
@@ -203,8 +250,17 @@ export function AppointmentSection({ services, phone }) {
               <input
                 type="date"
                 // Set on interaction: reading the clock during render breaks prerendering.
-                onFocus={(event) => (event.currentTarget.min = today())}
-                onPointerDown={(event) => (event.currentTarget.min = today())}
+                // The workshop's own dates (Dhaka) win once availability has loaded.
+                min={availability?.today}
+                max={availability?.max_date}
+                onFocus={(event) => {
+                  loadAvailability();
+                  if (!availability) event.currentTarget.min = today();
+                }}
+                onPointerDown={(event) => {
+                  loadAvailability();
+                  if (!availability) event.currentTarget.min = today();
+                }}
                 className={cn(controlClass, dateEmpty && "text-transparent focus:text-white")}
                 {...fieldProps("preferred_date")}
               />
