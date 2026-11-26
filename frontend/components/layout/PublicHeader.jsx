@@ -147,7 +147,8 @@ export function PublicHeader({ site = FALLBACK_SITE, services = FALLBACK_SERVICE
             >
               <WhatsAppIcon className="size-6" />
             </a>
-            <Link href="/login" aria-label="Login" className={iconLink}>
+            {/* /account: logged-in customers see their dashboard; guests are sent to /login (proxy). */}
+            <Link href="/account" aria-label="My account" className={iconLink}>
               <CircleUserRound className="size-7" aria-hidden="true" />
             </Link>
           </div>
@@ -274,9 +275,9 @@ export function PublicHeader({ site = FALLBACK_SITE, services = FALLBACK_SERVICE
                 <CalendarCheck aria-hidden="true" />
                 Book Appointment
               </Button>
-              <Button href="/login" variant="outline-light" className="w-full" onClick={close}>
+              <Button href="/account" variant="outline-light" className="w-full" onClick={close}>
                 <CircleUserRound aria-hidden="true" />
-                Login
+                My account
               </Button>
             </div>
             <ul className="space-y-2.5 text-sm text-zinc-300">
