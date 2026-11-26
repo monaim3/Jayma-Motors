@@ -19,6 +19,11 @@ final class MediaUrl
             return null;
         }
 
+        // "//host/x" is another site, not a path on ours.
+        if (str_starts_with($path, '//') || str_starts_with($path, '/\\')) {
+            return null;
+        }
+
         if (str_starts_with($path, '/') || str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) {
             return $path;
         }

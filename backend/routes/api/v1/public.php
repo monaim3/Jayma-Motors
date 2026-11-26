@@ -23,8 +23,9 @@ Route::get('/redirects', RedirectController::class)->name('redirects.show');
 
 Route::get('/vehicle-brands', VehicleBrandController::class)->name('vehicle-brands.index');
 
-// B3 — booking (Step 7 §9).
+// B3 — booking (Step 7 §9). Booking needs a signed-in, active customer
+// (owner, 2026-11-26); guests are sent to log in by the website first.
 Route::get('/appointments/availability', [AppointmentController::class, 'availability'])->name('appointments.availability');
 Route::post('/appointments', [AppointmentController::class, 'store'])
-    ->middleware('throttle:public-forms')
+    ->middleware(['auth:sanctum', 'active', 'customer', 'throttle:public-forms'])
     ->name('appointments.store');

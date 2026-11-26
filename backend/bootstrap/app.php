@@ -3,6 +3,7 @@
 use App\Http\Middleware\EnsureActiveUser;
 use App\Http\Middleware\EnsureCustomer;
 use App\Http\Middleware\EnsureStaff;
+use App\Http\Middleware\SecurityHeaders;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -20,6 +21,11 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         // Cookie-based SPA authentication for the Next.js frontend (Step 1 §7.1).
         $middleware->statefulApi();
+        $middleware->append(SecurityHeaders::class);
+
+        // API only: a signed-out request gets a clean 401, not a redirect to
+        // a "login" page that doesn't exist here (which surfaced as a 500).
+        $middleware->redirectGuestsTo(fn () => null);
 
         $middleware->alias([
             'role' => RoleMiddleware::class,

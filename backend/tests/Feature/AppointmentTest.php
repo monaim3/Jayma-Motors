@@ -20,6 +20,11 @@ use Database\Seeders\RolesAndPermissionsSeeder;
 beforeEach(function () {
     $this->seed([RolesAndPermissionsSeeder::class, ContentSeeder::class]);
     $this->travelTo(CarbonImmutable::parse('2026-11-25 10:00:00', 'Asia/Dhaka'));
+
+    // Booking needs a signed-in customer (owner, 2026-11-26).
+    $this->customer = User::factory()->create(['phone' => '+8801999999999'])->assignRole(Role::Customer->value);
+    $this->customer->customer()->create(['name' => 'Rahim Uddin', 'phone' => '+8801999999999', 'email' => $this->customer->email]);
+    $this->actingAs($this->customer);
 });
 
 function booking(array $overrides = []): array
@@ -40,7 +45,15 @@ function booking(array $overrides = []): array
 
 /* Booking */
 
-it('books a guest appointment and returns its reference', function () {
+it('turns away guests: booking needs an account', function () {
+    app('auth')->forgetGuards();
+    auth()->guard('web')->logout();
+
+    $this->postJson('/api/v1/appointments', booking())->assertUnauthorized();
+    expect(Appointment::count())->toBe(0);
+});
+
+it('books an appointment for the signed-in customer and returns its reference', function () {
     $this->postJson('/api/v1/appointments', booking())
         ->assertCreated()
         ->assertJsonPath('data.reference', 'APT-2026-00001')
@@ -52,7 +65,7 @@ it('books a guest appointment and returns its reference', function () {
         ->and($appointment->contact_email)->toBe('rahim@example.com')
         ->and($appointment->registration_number_normalized)->toBe('DHAKAMETROGA123456')
         ->and($appointment->service->slug)->toBe('engine-brake-servicing')
-        ->and($appointment->customer_id)->toBeNull()
+        ->and($appointment->customer_id)->toBe($this->customer->customer->id)
         ->and($appointment->source->value)->toBe('website')
         ->and(AuditLog::where('event', 'appointment.booked')->count())->toBe(1);
 });

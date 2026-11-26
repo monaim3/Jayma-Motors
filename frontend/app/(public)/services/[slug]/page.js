@@ -1,3 +1,4 @@
+import { jsonLdHtml } from "@/lib/json-ld";
 import {
   AlertTriangle,
   ArrowRight,
@@ -91,7 +92,7 @@ export default async function ServiceDetailPage({ params }) {
       <script
         type="application/ld+json"
         // Static content from our own code, not user input.
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={jsonLdHtml(jsonLd)}
       />
 
       {/* Hero: text left, photo right */}

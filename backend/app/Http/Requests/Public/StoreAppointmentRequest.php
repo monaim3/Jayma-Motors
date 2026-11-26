@@ -9,12 +9,16 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\Validator;
 
 /**
- * POST /appointments (Step 2 M2, Step 7 §9). Works for guests; a logged-in
- * customer's booking is linked to their profile. The service can be sent
- * as its slug (website form) or its id. `website` is a honeypot.
+ * POST /appointments (Step 7 §9). Signed-in customers only (owner,
+ * 2026-11-26); the booking is linked to their profile. The service can be
+ * sent as its slug (website form) or its id. `website` is a honeypot.
+ * Names and car details may not contain web links: they are shown in emails.
  */
 class StoreAppointmentRequest extends FormRequest
 {
+    /** No web links in short text fields (they appear in emails sent from our domain). */
+    public const NO_LINKS = 'not_regex:/(https?:|:\/\/|www\.)/i';
+
     private ?Service $service = null;
 
     protected function prepareForValidation(): void
@@ -42,7 +46,7 @@ class StoreAppointmentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'contact_name' => ['required', 'string', 'min:2', 'max:100'],
+            'contact_name' => ['required', 'string', 'min:2', 'max:100', self::NO_LINKS],
             'contact_phone' => [
                 'required',
                 'string',
@@ -56,9 +60,9 @@ class StoreAppointmentRequest extends FormRequest
             'preferred_date' => ['required', 'date_format:Y-m-d'],
             // A logged-in customer may pick one of their saved cars instead (B4).
             'vehicle_id' => ['nullable', 'integer'],
-            'vehicle_brand' => ['required_without:vehicle_id', 'nullable', 'string', 'max:60'],
-            'vehicle_model' => ['required_without:vehicle_id', 'nullable', 'string', 'max:80'],
-            'registration_number' => ['required_without:vehicle_id', 'nullable', 'string', 'min:3', 'max:40'],
+            'vehicle_brand' => ['required_without:vehicle_id', 'nullable', 'string', 'max:60', self::NO_LINKS],
+            'vehicle_model' => ['required_without:vehicle_id', 'nullable', 'string', 'max:80', self::NO_LINKS],
+            'registration_number' => ['required_without:vehicle_id', 'nullable', 'string', 'min:3', 'max:40', self::NO_LINKS],
             'service' => ['required_without:service_id', 'nullable', 'string', 'max:120'],
             'service_id' => ['required_without:service', 'nullable', 'integer'],
             'notes' => ['nullable', 'string', 'max:1000'],
@@ -98,6 +102,7 @@ class StoreAppointmentRequest extends FormRequest
     {
         return [
             'contact_name.required' => 'Please enter your name.',
+            '*.not_regex' => 'Please remove the web link from this field.',
             'preferred_date.required' => 'Please choose a date.',
             'vehicle_brand.required_without' => 'Please choose your car brand.',
             'vehicle_model.required_without' => 'Please enter your car model.',

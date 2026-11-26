@@ -1,3 +1,4 @@
+import { jsonLdHtml } from "@/lib/json-ld";
 import { MessageCircleQuestion, Plus } from "lucide-react";
 import { WhatsAppIcon } from "@/components/brand/WhatsAppIcon";
 import { Button } from "@/components/ui/Button";
@@ -27,7 +28,7 @@ export async function FaqSection() {
       <script
         type="application/ld+json"
         // Static content from our own file, not user input.
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(FAQ_JSON_LD) }}
+        dangerouslySetInnerHTML={jsonLdHtml(FAQ_JSON_LD)}
       />
       <Container className="grid gap-10 py-10 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] lg:gap-16 2xl:py-15">
         <div className="lg:sticky lg:top-32 lg:self-start">

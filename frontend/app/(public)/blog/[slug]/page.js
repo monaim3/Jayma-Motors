@@ -1,3 +1,4 @@
+import { jsonLdHtml } from "@/lib/json-ld";
 import { AlertTriangle, ArrowRight, CalendarCheck, CheckCircle2, Clock, Lightbulb, Phone } from "lucide-react";
 import Image from "next/image";
 import { notFound } from "next/navigation";
@@ -122,7 +123,7 @@ export default async function BlogPostPage({ params }) {
       <script
         type="application/ld+json"
         // Static content from our own code, not user input.
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={jsonLdHtml(jsonLd)}
       />
       <ReadingProgress targetId="article-body" />
 

@@ -80,12 +80,15 @@ class AppointmentController extends Controller
         return $this->detail($appointment);
     }
 
-    /** PATCH /admin/appointments/{appointment} — time note, staff notes, link a customer. */
+    /**
+     * PATCH /admin/appointments/{appointment} — time note, link a customer.
+     * `notes` is the customer's own note (they see it in their account), so
+     * staff can't overwrite it here; internal remarks need their own field.
+     */
     public function update(Request $request, Appointment $appointment, AuditLogger $audit): AppointmentResource
     {
         $data = $request->validate([
             'time_note' => ['sometimes', 'nullable', 'string', 'max:50'],
-            'notes' => ['sometimes', 'nullable', 'string', 'max:1000'],
             'customer_id' => ['sometimes', 'nullable', 'integer', 'exists:customers,id'],
         ]);
 

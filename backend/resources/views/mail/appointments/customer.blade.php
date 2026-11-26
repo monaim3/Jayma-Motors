@@ -1,3 +1,4 @@
+@use('App\Services\Support\MailText')
 <x-mail::message>
 # {{ match ($kind) {
     'confirmed' => 'Your appointment is confirmed',
@@ -6,7 +7,7 @@
     default => 'Thank you for your booking',
 } }}
 
-Hello {{ $appointment->contact_name }},
+Hello {{ MailText::escape($appointment->contact_name) }},
 
 @switch($kind)
 @case('confirmed')
@@ -16,7 +17,7 @@ Your appointment at Jayma Motors is **confirmed**. We look forward to seeing you
 Your appointment has been moved to a new date. The details are below.
 @break
 @case('cancelled')
-Your appointment has been **cancelled**.@if ($appointment->cancellation_reason) Reason: {{ $appointment->cancellation_reason }}@endif
+Your appointment has been **cancelled**.@if ($appointment->cancellation_reason) Reason: {{ MailText::escape($appointment->cancellation_reason) }}@endif
 @break
 @default
 We have received your booking request. **Our team will call you to confirm the time.**
@@ -24,9 +25,9 @@ We have received your booking request. **Our team will call you to confirm the t
 
 <x-mail::panel>
 **Reference:** {{ $appointment->reference }}<br>
-**Date:** {{ $appointment->preferred_date->format('l, j F Y') }}@if ($appointment->time_note) at {{ $appointment->time_note }}@endif<br>
+**Date:** {{ $appointment->preferred_date->format('l, j F Y') }}@if ($appointment->time_note) at {{ MailText::escape($appointment->time_note) }}@endif<br>
 **Service:** {{ $appointment->service?->name ?? '—' }}<br>
-**Car:** {{ $appointment->vehicle_brand }} {{ $appointment->vehicle_model }} ({{ $appointment->registration_number }})
+**Car:** {{ MailText::escape($appointment->vehicle_brand) }} {{ MailText::escape($appointment->vehicle_model) }} ({{ MailText::escape($appointment->registration_number) }})
 </x-mail::panel>
 
 @if ($appointment->customer_id && $kind !== 'cancelled')

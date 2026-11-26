@@ -80,8 +80,13 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('api', fn (Request $request) => Limit::perMinute(120)
             ->by($request->user()?->id ?: $request->ip()));
 
-        RateLimiter::for('login', fn (Request $request) => Limit::perMinute(5)
-            ->by(Str::lower((string) $request->input('login', $request->input('email'))).'|'.$request->ip()));
+        // Per account+IP (one person guessing) and per IP alone (one machine
+        // trying a common password against many accounts).
+        RateLimiter::for('login', fn (Request $request) => [
+            Limit::perMinute(5)
+                ->by(Str::lower((string) $request->input('login', $request->input('email'))).'|'.$request->ip()),
+            Limit::perMinute(20)->by('ip|'.$request->ip()),
+        ]);
 
         RateLimiter::for('register', fn (Request $request) => Limit::perHour(5)->by($request->ip()));
 

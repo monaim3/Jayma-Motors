@@ -49,7 +49,20 @@ const nextConfig = {
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
           { key: "X-Frame-Options", value: "DENY" },
           { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
+          // Browsers always use HTTPS for this site and its subdomains (api, dev).
+          { key: "Strict-Transport-Security", value: "max-age=31536000; includeSubDomains" },
+          // Safe baseline: no plugins, no <base> hijack, forms post only here, no framing.
+          {
+            key: "Content-Security-Policy",
+            value: "object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'",
+          },
         ],
+      },
+      // The test copy at dev.jaymamotors.com must not appear in Google.
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "dev.jaymamotors.com" }],
+        headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
       },
       // Static files in public/ (3.5 MB 3D car, photos, videos): let browsers keep
       // them for a week, then refresh in the background. Names aren't hashed, so a

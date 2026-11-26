@@ -37,9 +37,15 @@ function staffAs(?User $user)
     return $user ? test()->actingAs($user) : test();
 }
 
+/** A booking made on the website by a (new) signed-in customer. */
 function websiteBooking(array $overrides = []): Appointment
 {
-    staffAs(null)->postJson('/api/v1/appointments', [
+    static $count = 0;
+    $customer = User::factory()->create(['phone' => sprintf('+88017%08d', 60000000 + ++$count)])
+        ->assignRole(Role::Customer->value);
+    $customer->customer()->create(['name' => $customer->name, 'phone' => $customer->phone, 'email' => $customer->email]);
+
+    staffAs($customer)->postJson('/api/v1/appointments', [
         'contact_name' => 'Rahim Uddin',
         'contact_phone' => '01711949110',
         'contact_email' => 'rahim@example.com',

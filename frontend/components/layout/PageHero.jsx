@@ -1,3 +1,4 @@
+import { jsonLdHtml } from "@/lib/json-ld";
 import { ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { Container } from "@/components/ui/Container";
@@ -30,7 +31,7 @@ export function PageHero({ eyebrow, title, intro, crumbs = [], aside, children }
       <script
         type="application/ld+json"
         // Static content from our own code, not user input.
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={jsonLdHtml(jsonLd)}
       />
       <div
         aria-hidden="true"

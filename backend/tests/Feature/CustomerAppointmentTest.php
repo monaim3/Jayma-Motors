@@ -44,9 +44,11 @@ function actAs(?User $user)
     return $user ? test()->actingAs($user) : test();
 }
 
+/** Book as $user, or as another (new) customer when $user is null. Booking needs an account. */
 function bookFor(?User $user, array $overrides = []): string
 {
-    $request = actAs($user);
+    static $others = 0;
+    $request = actAs($user ?? customerUser(sprintf('+88019%08d', 50000000 + ++$others)));
 
     return $request->postJson('/api/v1/appointments', [
         'contact_name' => 'Rahim Uddin',

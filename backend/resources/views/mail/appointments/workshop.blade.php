@@ -1,3 +1,4 @@
+@use('App\Services\Support\MailText')
 <x-mail::message>
 # {{ $kind === 'cancelled' ? 'Booking cancelled by the customer' : 'New booking request' }}
 
@@ -12,14 +13,14 @@ A new booking was made on the website. Please call the customer to confirm the t
 |:--|:--|
 | **Reference** | {{ $appointment->reference }} |
 | **Date** | {{ $appointment->preferred_date->format('l, j F Y') }} |
-| **Name** | {{ $appointment->contact_name }} |
+| **Name** | {{ MailText::escape($appointment->contact_name) }} |
 | **Phone** | {{ $phone }} |
-| **Email** | {{ $appointment->contact_email ?? '—' }} |
-| **Car** | {{ $appointment->vehicle_brand }} {{ $appointment->vehicle_model }} |
-| **Car number** | {{ $appointment->registration_number }} |
+| **Email** | {{ $appointment->contact_email ? MailText::escape($appointment->contact_email) : "—" }} |
+| **Car** | {{ MailText::escape($appointment->vehicle_brand) }} {{ MailText::escape($appointment->vehicle_model) }} |
+| **Car number** | {{ MailText::escape($appointment->registration_number) }} |
 | **Service** | {{ $appointment->service?->name ?? '—' }} |
 @if ($appointment->notes)
-| **Notes** | {{ $appointment->notes }} |
+| **Notes** | {{ MailText::escape($appointment->notes) }} |
 @endif
 </x-mail::table>
 

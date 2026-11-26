@@ -265,12 +265,22 @@ export function AppointmentSection({ services, phone }) {
 
     // Guests log in or sign up first; their details wait in the browser meanwhile.
     const who = viewer === "checking" ? ((await fetchViewer())?.type ?? "guest") : viewer;
-    if (who === "guest") {
+    const sendToLogin = () => {
       saveDraft(values);
       toast("Log in or create an account to finish your booking", {
         description: "Your details are saved — you won't need to type them again.",
       });
       router.push(`/login?next=${encodeURIComponent("/?booking=resume#appointment")}`);
+    };
+    if (who === "guest") {
+      sendToLogin();
+      return;
+    }
+    // Staff book for customers in the admin panel (the website form is for customers).
+    if (who === "staff") {
+      toast.error("Staff accounts can't book here", {
+        description: "Use Admin → Appointments → New booking instead.",
+      });
       return;
     }
 
@@ -296,6 +306,11 @@ export function AppointmentSection({ services, phone }) {
       });
     } catch (error) {
       if (applyFieldErrors(error, setError)) return;
+      // Signed out meanwhile (session expired): log in again, form kept.
+      if (error?.status === 401) {
+        sendToLogin();
+        return;
+      }
       // 409: the same car is already booked for that day (or too many tries: 429).
       if (error?.status === 409 || error?.status === 429) {
         toast.error(error.message, { description: `Questions? Call us on ${phone}.` });

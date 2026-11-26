@@ -45,11 +45,10 @@ class AppointmentController extends Controller
         ]);
     }
 
-    /** POST /appointments → 201 { reference, status, preferred_date }. */
+    /** POST /appointments (signed-in customers) → 201 { reference, status, preferred_date }. */
     public function store(StoreAppointmentRequest $request, AppointmentService $appointments): JsonResponse
     {
-        $user = $request->user('sanctum');
-        $appointment = $appointments->book($request->bookingData(), $user?->isCustomer() ? $user : null);
+        $appointment = $appointments->book($request->bookingData(), $request->user());
 
         return response()->json([
             'data' => [

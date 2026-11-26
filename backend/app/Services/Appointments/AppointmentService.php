@@ -13,6 +13,7 @@ use App\Services\Support\AuditLogger;
 use App\Services\Support\ReferenceNumberGenerator;
 use App\Services\Vehicles\VehicleService;
 use Carbon\CarbonImmutable;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
@@ -44,11 +45,28 @@ final class AppointmentService
     {
         $data = $this->withVehicle($data, $user, $source);
         $date = CarbonImmutable::parse($data['preferred_date'], config('app.business_timezone'));
-        $this->rules->assertBookable($date);
-
         $registration = Appointment::normalizeRegistration($data['registration_number']);
 
-        $appointment = DB::transaction(function () use ($data, $user, $source, $date, $registration) {
+        // One booking per date at a time: the "fully booked" check and the insert
+        // happen together, so simultaneous requests can't go over the daily limit.
+        $appointment = Cache::lock('appointments:book:'.$date->toDateString(), 10)
+            ->block(5, function () use ($data, $user, $source, $date, $registration) {
+                $this->rules->assertBookable($date);
+
+                return $this->create($data, $user, $source, $date, $registration);
+            });
+
+        AppointmentBooked::dispatch($appointment);
+
+        return $appointment;
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     */
+    private function create(array $data, ?User $user, AppointmentSource $source, CarbonImmutable $date, string $registration): Appointment
+    {
+        return DB::transaction(function () use ($data, $user, $source, $date, $registration) {
             // Same phone + same day + same car while an earlier booking is still open (Step 3 §6.1).
             $duplicate = Appointment::query()
                 ->where('registration_number_normalized', $registration)
@@ -101,10 +119,6 @@ final class AppointmentService
 
             return $appointment;
         });
-
-        AppointmentBooked::dispatch($appointment);
-
-        return $appointment;
     }
 
     /**
@@ -129,10 +143,17 @@ final class AppointmentService
             throw ValidationException::withMessages(['vehicle_id' => 'Choose one of your saved cars.']);
         }
 
+        // Staff: link the booking to the car's owner only when the contact phone
+        // is the owner's — a car number added by the wrong account must not
+        // let that account see someone else's booking.
+        $ownerMatches = $source === AppointmentSource::Staff
+            && $vehicle->customer?->phone !== null
+            && $vehicle->customer->phone === ($data['contact_phone'] ?? null);
+
         return [
             ...$data,
             'vehicle_id' => $vehicle->id,
-            'customer_id' => $data['customer_id'] ?? ($source === AppointmentSource::Staff ? $vehicle->customer_id : null),
+            'customer_id' => $data['customer_id'] ?? ($ownerMatches ? $vehicle->customer_id : null),
             'vehicle_brand' => $vehicle->brand_name,
             'vehicle_model' => $vehicle->model,
             'registration_number' => $vehicle->registration_number,
