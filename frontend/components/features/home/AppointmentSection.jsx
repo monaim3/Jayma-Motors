@@ -2,6 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CalendarDays, Car, CarFront, CircleUserRound, Hash, LoaderCircle, Mail, Phone, Settings } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
@@ -44,6 +45,49 @@ const EMPTY = {
   service: "",
   website: "",
 };
+
+/*
+ * A guest's booking details while they log in or sign up. sessionStorage: kept
+ * across the trip to /login and back in the same tab, gone when it's closed.
+ * Expires after an hour so an old half-booking doesn't reappear later.
+ */
+const DRAFT_KEY = "jayma:booking-draft";
+const DRAFT_TTL = 60 * 60 * 1000;
+
+function saveDraft(values) {
+  try {
+    const { website, ...fields } = values; // never keep the spam-trap field
+    sessionStorage.setItem(DRAFT_KEY, JSON.stringify({ at: Date.now(), fields }));
+  } catch {
+    // Storage blocked (private mode): they'll just fill the form again.
+  }
+}
+
+function readDraft() {
+  try {
+    const saved = JSON.parse(sessionStorage.getItem(DRAFT_KEY) ?? "null");
+    return saved && Date.now() - saved.at < DRAFT_TTL ? saved.fields : null;
+  } catch {
+    return null;
+  }
+}
+
+function clearDraft() {
+  try {
+    sessionStorage.removeItem(DRAFT_KEY);
+  } catch {
+    // ignore
+  }
+}
+
+/** The signed-in user (GET /auth/me), or null for guests. No call without a session cookie. */
+function fetchViewer() {
+  if (!document.cookie.includes("XSRF-TOKEN")) return Promise.resolve(null);
+  return api
+    .get("/auth/me")
+    .then(({ data }) => data.data)
+    .catch(() => null);
+}
 
 /** Today in the visitor's timezone as YYYY-MM-DD (for the date picker's minimum). */
 function today() {
@@ -89,7 +133,9 @@ const controlClass =
 
 /**
  * Home appointment form (Step 2 M2), transparent over a dark backdrop.
- * Posts to POST /api/v1/appointments (backend milestone B3).
+ * Posts to POST /api/v1/appointments (backend milestone B3). Booking needs an
+ * account (owner, 2026-11-26): a guest is sent to log in or sign up and comes
+ * back to this form with their details restored.
  */
 export function AppointmentSection({ services, phone }) {
   const {
@@ -135,30 +181,45 @@ export function AppointmentSection({ services, phone }) {
   }, [availability, preferredDate, setError]);
 
   /**
-   * Logged-in customers (Step 3 §6.1): pre-fill their details and offer their
-   * saved cars. Only tried when a session cookie exists, so guests make no call.
+   * Who is booking (owner, 2026-11-26: booking needs an account). Logged-in
+   * customers get their details pre-filled and their saved cars offered. A
+   * guest's filled-in form is kept in the browser while they log in or sign
+   * up, and restored here when they come back (?booking=resume).
+   * "checking" until known; only asks the API when a session cookie exists.
    */
+  const router = useRouter();
+  const [viewer, setViewer] = useState("checking"); // checking | guest | customer | staff
   const [myCars, setMyCars] = useState([]);
   const [chosenCar, setChosenCar] = useState(null);
   useEffect(() => {
-    if (!document.cookie.includes("XSRF-TOKEN")) return;
     let cancelled = false;
-    api
-      .get("/auth/me")
-      .then(async ({ data }) => {
-        const user = data.data;
-        if (cancelled || user.type !== "customer") return;
-        const fill = (name, value) => {
-          const input = document.getElementById(`apt-${name}`);
-          if (value && input && !input.value) setValue(name, value);
-        };
-        fill("contact_name", user.name);
-        fill("contact_phone", user.phone?.replace(/^\+88/, ""));
-        fill("contact_email", user.email);
-        const cars = await api.get("/me/vehicles");
-        if (!cancelled) setMyCars(cars.data.data);
-      })
-      .catch(() => {}); // not logged in: the form works as a guest form
+    fetchViewer().then(async (user) => {
+      if (cancelled) return;
+      setViewer(user ? user.type : "guest");
+      if (user?.type !== "customer") return;
+
+      // Back from login/sign-up: put the guest's booking details back first.
+      const draft = readDraft();
+      if (draft) {
+        clearDraft();
+        Object.entries(draft).forEach(([name, value]) => value && setValue(name, value));
+        window.history.replaceState(null, "", "/#appointment");
+        document.getElementById("appointment")?.scrollIntoView({ behavior: "smooth" });
+        toast.success(`Welcome, ${user.name.split(" ")[0]}! Your booking details are back`, {
+          description: "Check them and tap Book appointment.",
+        });
+      }
+
+      const fill = (name, value) => {
+        const input = document.getElementById(`apt-${name}`);
+        if (value && input && !input.value) setValue(name, value);
+      };
+      fill("contact_name", user.name);
+      fill("contact_phone", user.phone?.replace(/^\+88/, ""));
+      fill("contact_email", user.email);
+      const cars = await api.get("/me/vehicles").catch(() => null);
+      if (!cancelled && cars) setMyCars(cars.data.data);
+    });
     return () => {
       cancelled = true;
     };
@@ -201,6 +262,18 @@ export function AppointmentSection({ services, phone }) {
       );
       return;
     }
+
+    // Guests log in or sign up first; their details wait in the browser meanwhile.
+    const who = viewer === "checking" ? ((await fetchViewer())?.type ?? "guest") : viewer;
+    if (who === "guest") {
+      saveDraft(values);
+      toast("Log in or create an account to finish your booking", {
+        description: "Your details are saved — you won't need to type them again.",
+      });
+      router.push(`/login?next=${encodeURIComponent("/?booking=resume#appointment")}`);
+      return;
+    }
+
     try {
       await ensureCsrfCookie();
       // A saved car that wasn't edited afterwards is sent by id (keeps its exact details).

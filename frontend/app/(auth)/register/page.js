@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { AuthSwitchLink, BookingResumeNotice } from "@/components/features/auth/AuthNextLinks";
 import { RegisterForm } from "@/components/features/auth/RegisterForm";
 
 export const metadata = {
@@ -13,16 +13,14 @@ export default function RegisterPage() {
       <p className="mt-2 text-zinc-600">
         Book faster, track your car&apos;s service and keep its history in one place.
       </p>
+      <BookingResumeNotice />
 
       <div className="mt-8">
         <RegisterForm />
       </div>
 
       <p className="mt-8 text-center text-sm text-zinc-600">
-        Already have an account?{" "}
-        <Link href="/login" className="font-semibold text-brand-600 hover:underline">
-          Log in
-        </Link>
+        Already have an account? <AuthSwitchLink href="/login">Log in</AuthSwitchLink>
       </p>
     </div>
   );

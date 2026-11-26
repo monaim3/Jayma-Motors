@@ -13,7 +13,7 @@ import { FormField } from "@/components/ui/FormField";
 import { Input } from "@/components/ui/Input";
 import { api, ensureCsrfCookie } from "@/lib/api/browser-client";
 import { applyFieldErrors } from "@/lib/api/errors";
-import { isBdMobile } from "@/lib/auth";
+import { isBdMobile, safeNextPath } from "@/lib/auth";
 
 // Mirrors the backend rules (Step 3 §4.1); the server has the final say (duplicates etc.).
 const schema = z
@@ -54,7 +54,8 @@ export function RegisterForm() {
       toast.success(`Welcome, ${data.data.name.split(" ")[0]}!`, {
         description: `We've sent a verification link to ${data.data.email}.`,
       });
-      router.replace("/account");
+      // Back to where they came from (e.g. their unfinished booking), else the dashboard.
+      router.replace(safeNextPath());
       router.refresh();
     } catch (error) {
       if (applyFieldErrors(error, setError)) return;
