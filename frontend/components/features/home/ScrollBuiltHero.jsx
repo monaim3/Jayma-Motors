@@ -33,6 +33,8 @@ export function ScrollBuiltHero() {
   const sectionRef = useRef(null);
   const stickyRef = useRef(null);
   const textRef = useRef(null);
+  // Set once the live car reports its progress; from then on it drives the caption.
+  const carDrivesCaptionRef = useRef(false);
   // Scroll progress lives in a ref: the 3D scene reads it every frame, so
   // scrolling doesn't re-render React. State changes only when the caption does.
   const progressRef = useRef(0);
@@ -50,8 +52,15 @@ export function ScrollBuiltHero() {
     const next = distance > 0 ? clamp((stickyTop - section.getBoundingClientRect().top) / distance) : 1;
 
     progressRef.current = next;
-    setStageIndex(stageAt(next));
+    // Once the live car runs, the caption follows the car itself (onCarProgress),
+    // so a quick flick never shows "Painting" over a car that is still being built.
+    if (!carDrivesCaptionRef.current) setStageIndex(stageAt(next));
     setAtTop(next < 0.03);
+  }, []);
+
+  const onCarProgress = useCallback((value) => {
+    carDrivesCaptionRef.current = true;
+    setStageIndex(stageAt(value));
   }, []);
 
   /**
@@ -154,7 +163,12 @@ export function ScrollBuiltHero() {
         {/* 3D stage fills the hero; the camera frames the car beside (desktop) or below (phones) the text. */}
         {/* Soft fade at the bottom so the hero flows into the booking form below. */}
         <div className="absolute inset-0 [mask-image:linear-gradient(to_bottom,black_85%,transparent)]">
-          <HeroCar3D getProgress={getProgress} getFreeArea={getFreeArea} fallbackProgress={fallbackProgress} />
+          <HeroCar3D
+            getProgress={getProgress}
+            getFreeArea={getFreeArea}
+            onProgress={onCarProgress}
+            fallbackProgress={fallbackProgress}
+          />
         </div>
         {/* Keeps the text readable when floating parts drift behind it. */}
         <div

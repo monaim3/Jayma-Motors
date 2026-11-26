@@ -28,6 +28,24 @@ export function VideoShowcaseSection() {
   const cardAspect = video.cardAspect ?? video.aspect;
   const portrait = cardAspect < 1;
 
+  // The section sits far down the page: load its poster and preview only when
+  // the visitor gets near, so they don't slow down the first screen.
+  const [near, setNear] = useState(false);
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        setNear(true);
+        observer.disconnect();
+      },
+      { rootMargin: "800px 0px" },
+    );
+    observer.observe(section);
+    return () => observer.disconnect();
+  }, []);
+
   // Play the silent previews only while the section is on screen.
   useEffect(() => {
     const section = sectionRef.current;
@@ -44,15 +62,15 @@ export function VideoShowcaseSection() {
     );
     observer.observe(section);
     return () => observer.disconnect();
-  }, [open]);
+  }, [open, near]);
 
   const previewProps = {
-    src: video.preview,
-    poster: video.poster,
+    src: near ? video.preview : undefined,
+    poster: near ? video.poster : undefined,
     muted: true,
     loop: true,
     playsInline: true,
-    preload: "metadata",
+    preload: near ? "metadata" : "none",
     "aria-hidden": true,
     tabIndex: -1,
   };

@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
-import { preload } from "react-dom";
 import { cn } from "@/lib/utils";
 import { HeroCar } from "./HeroCar";
 
@@ -26,7 +25,7 @@ const getCanRender3DOnServer = () => true;
 
 /**
  * 3D scroll-assembled car (three.js). The model download starts with the page
- * (preload) and the scene loads in the browser only; a poster still of the
+ * (after page load) and the scene starts in the browser only; a poster still of the
  * opening scene shows meanwhile and crossfades into the live car. The line-art
  * car is only for devices without WebGL or with data saving on.
  *
@@ -34,21 +33,20 @@ const getCanRender3DOnServer = () => true;
  *   every frame, so scrolling doesn't re-render React.
  * @param fallbackProgress - progress for the line-art fallback (updates per stage).
  */
-export function HeroCar3D({ getProgress, getFreeArea, fallbackProgress, className }) {
+export function HeroCar3D({ getProgress, getFreeArea, onProgress, fallbackProgress, className }) {
   const canvasRef = useRef(null);
   const getProgressRef = useRef(getProgress);
   const getFreeAreaRef = useRef(getFreeArea);
+  const onProgressRef = useRef(onProgress);
   const [ready, setReady] = useState(false);
   const [showPoster, setShowPoster] = useState(true);
   const supported = useSyncExternalStore(subscribeNoop, canRender3D, getCanRender3DOnServer);
 
-  // Fetch the 3.2 MB model alongside the page instead of after the JS loads.
-  preload(MODEL_URL, { as: "fetch", crossOrigin: "anonymous" });
-
   useEffect(() => {
     getProgressRef.current = getProgress;
     getFreeAreaRef.current = getFreeArea;
-  }, [getProgress, getFreeArea]);
+    onProgressRef.current = onProgress;
+  }, [getProgress, getFreeArea, onProgress]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -60,16 +58,40 @@ export function HeroCar3D({ getProgress, getFreeArea, fallbackProgress, classNam
     // Weak devices only: phones in general get the sharp render (their screens show blur most).
     const lowPower = (navigator.hardwareConcurrency ?? 8) <= 4;
 
-    import("./car-scene").then(({ CarScene }) => {
-      if (cancelled) return;
-      scene = new CarScene(canvas, {
-        lowPower,
-        getTarget: () => getProgressRef.current(),
-        getFreeArea: () => getFreeAreaRef.current?.(),
-        onReady: () => setReady(true),
+    /*
+     * Start the live 3D on the visitor's first touch, scroll, key or mouse move
+     * — exactly when the animation is needed. Until then the poster (a still of
+     * the same opening scene) shows. Starting WebGL during page load kept a
+     * phone's processor busy for seconds, delaying the headline and making the
+     * page feel stuck. The model and script are already downloaded in the
+     * background (after page load + webpackPrefetch), so the car comes alive quickly.
+     */
+    let started = false;
+    const begin = () => {
+      if (started) return;
+      started = true;
+      removeTriggers();
+      import(/* webpackPrefetch: true */ "./car-scene").then(({ CarScene }) => {
+        if (cancelled) return;
+        scene = new CarScene(canvas, {
+          lowPower,
+          getTarget: () => getProgressRef.current(),
+          getFreeArea: () => getFreeAreaRef.current?.(),
+          onProgress: (value) => onProgressRef.current?.(value),
+          onReady: () => setReady(true),
+        });
+        if (visible) scene.start();
       });
-      if (visible) scene.start();
-    });
+    };
+    // Download the 3.2 MB model once the page itself has fully loaded, so it
+    // never competes with the fonts, styles and images the visitor sees first.
+    const warmModel = () => fetch(MODEL_URL, { priority: "low" }).catch(() => {});
+    if (document.readyState === "complete") warmModel();
+    else window.addEventListener("load", warmModel, { once: true });
+
+    const TRIGGERS = ["pointerdown", "pointermove", "touchstart", "wheel", "scroll", "keydown"];
+    const removeTriggers = () => TRIGGERS.forEach((type) => window.removeEventListener(type, begin));
+    TRIGGERS.forEach((type) => window.addEventListener(type, begin, { once: true, passive: true }));
 
     const resizeObserver = new ResizeObserver(() => scene?.resize());
     resizeObserver.observe(canvas);
@@ -84,6 +106,8 @@ export function HeroCar3D({ getProgress, getFreeArea, fallbackProgress, classNam
 
     return () => {
       cancelled = true;
+      window.removeEventListener("load", warmModel);
+      removeTriggers();
       resizeObserver.disconnect();
       visibility.disconnect();
       scene?.dispose();

@@ -182,7 +182,6 @@ export function ServicesSection({ services: items }) {
                       src={service.photo.src}
                       alt=""
                       fill
-                      priority={!clone && index - count < 3}
                       sizes="(min-width: 1024px) 30vw, (min-width: 640px) 48vw, 82vw"
                       style={{ objectPosition: servicePoster(service).focus }}
                       className="-z-20 object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-110"

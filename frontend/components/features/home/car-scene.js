@@ -101,6 +101,21 @@ const CLEARCOAT_MIN = 0.001;
 const PAINT_ENV = 0.35;
 /** How quickly the car catches up with the scroll position (per second). */
 const SMOOTHING = 7;
+/**
+ * Fastest the build may play (progress per second). A quick flick on a phone
+ * used to jump several stages at once; now the car plays through them.
+ */
+const MAX_SPEED = 0.45;
+/** Adaptive sharpness: render resolution steps between these, by measured frame time. */
+const MIN_PIXEL_RATIO = 1;
+const SLOW_FRAME_MS = 24; // below ~40 fps on average → a little softer
+const FAST_FRAME_MS = 13; // comfortably 60 fps → back to full sharpness
+
+/** Give the browser a moment (input, painting) between heavy set-up steps. */
+function yieldToMain() {
+  if (globalThis.scheduler?.yield) return globalThis.scheduler.yield();
+  return new Promise((resolve) => setTimeout(resolve, 0));
+}
 /** Phones: free space below the text on a typical tall phone (fallback when not measured). */
 const PHONE_FREE_AREA = { top: 0.42, bottom: 0.92 };
 /** The car's visual centre sits a little below the camera's aim point. */
@@ -114,9 +129,10 @@ export class CarScene {
    *   height) of the space left free by the text and the bottom bar; the car is
    *   framed inside it, so short screens don't put parts behind the text.
    */
-  constructor(canvas, { onReady, getTarget, getFreeArea, lowPower = false } = {}) {
+  constructor(canvas, { onReady, onProgress, getTarget, getFreeArea, lowPower = false } = {}) {
     this.canvas = canvas;
     this.onReady = onReady;
+    this.onProgress = onProgress;
     this.getTarget = getTarget;
     this.getFreeArea = getFreeArea;
     this.freeArea = PHONE_FREE_AREA;
@@ -142,7 +158,11 @@ export class CarScene {
     // Phones: their 2–3× screens look blurry below 2× and the canvas is small, so
     // allow 2×. Large screens stay at 1.5×; weak devices (≤4 cores) at most 1.5×.
     const phone = window.matchMedia("(max-width: 767px)").matches;
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, phone && !lowPower ? 2 : 1.5));
+    // Best sharpness the device can show; lowered step by step only if it can't keep up (see adapt()).
+    this.maxPixelRatio = Math.min(window.devicePixelRatio, phone && !lowPower ? 2 : 1.5);
+    this.pixelRatio = this.maxPixelRatio;
+    this.frameTimes = [];
+    this.renderer.setPixelRatio(this.pixelRatio);
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.renderer.toneMappingExposure = 1.05;
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -234,10 +254,14 @@ export class CarScene {
   }
 
   async load() {
+    // Decode the compressed geometry in background workers, not on the page's
+    // main thread (it froze phones for seconds while the page loaded).
+    MeshoptDecoder["useWorkers"]?.(Math.min(4, Math.max(1, (navigator.hardwareConcurrency ?? 4) - 1)));
     const loader = new GLTFLoader();
     loader.setMeshoptDecoder(MeshoptDecoder);
     const gltf = await loader.loadAsync(MODEL_URL);
     if (this.disposed) return;
+    await yieldToMain();
 
     const model = gltf.scene;
     this.model = model;
@@ -259,14 +283,23 @@ export class CarScene {
     this.forward = new THREE.Vector3(enginePos.x, 0, enginePos.z).normalize();
     this.side = new THREE.Vector3().crossVectors(this.forward, new THREE.Vector3(0, 1, 0)).normalize();
 
-    this.flattenHierarchy(model);
-    this.measureWheels(model);
-    this.collectParts(model);
-    this.collectMaterials(model);
-    this.clipBelowFloor(model);
-    this.buildLasers(size);
-    this.layoutShowcase();
-    this.createDriveCar();
+    // Set-up in small steps, letting the page breathe in between (scrolling,
+    // taps and text stay responsive while the car is being prepared).
+    const steps = [
+      () => this.flattenHierarchy(model),
+      () => this.measureWheels(model),
+      () => this.collectParts(model),
+      () => this.collectMaterials(model),
+      () => this.clipBelowFloor(model),
+      () => this.buildLasers(size),
+      () => this.layoutShowcase(),
+      () => this.createDriveCar(),
+    ];
+    for (const step of steps) {
+      step();
+      await yieldToMain();
+      if (this.disposed) return;
+    }
     await this.warmUp();
     if (this.disposed) return;
 
@@ -528,6 +561,30 @@ export class CarScene {
     cancelAnimationFrame(this.frame);
   }
 
+  /**
+   * Keep the animation smooth on every phone without giving up detail where
+   * the phone can manage: every 45 animated frames, if the average frame took
+   * too long, render a little softer (−0.25×); if it is fast again, go back up.
+   * Geometry, textures and effects never change — only the render resolution.
+   */
+  adapt(dt) {
+    this.frameTimes.push(dt * 1000);
+    if (this.frameTimes.length < 45) return;
+    const average = this.frameTimes.reduce((sum, ms) => sum + ms, 0) / this.frameTimes.length;
+    this.frameTimes = [];
+
+    let next = this.pixelRatio;
+    if (average > SLOW_FRAME_MS) next = Math.max(MIN_PIXEL_RATIO, this.pixelRatio - 0.25);
+    else if (average < FAST_FRAME_MS) next = Math.min(this.maxPixelRatio, this.pixelRatio + 0.25);
+    if (next === this.pixelRatio) return;
+
+    this.pixelRatio = next;
+    this.renderer.setPixelRatio(next);
+    const { clientWidth: width, clientHeight: height } = this.canvas;
+    this.renderer.setSize(width, height, false);
+    this.needsRender = true;
+  }
+
   update(force = false) {
     // Ease towards the scroll position so motion glides between scroll steps
     // (time-based, so it feels the same at 60 Hz and 120 Hz, and after a dropped frame).
@@ -536,8 +593,13 @@ export class CarScene {
     this.lastTick = now;
     const delta = this.target - this.progress;
     const moving = Math.abs(delta) > 0.0002;
-    if (moving) this.progress += delta * (1 - Math.exp(-SMOOTHING * dt));
-    else this.progress = this.target;
+    if (moving) {
+      const step = delta * (1 - Math.exp(-SMOOTHING * dt));
+      const limit = MAX_SPEED * dt;
+      this.progress += Math.max(-limit, Math.min(limit, step));
+    } else this.progress = this.target;
+    this.onProgress?.(this.progress);
+    if (moving) this.adapt(dt);
 
     // `p` runs the build (0 → 1); after HERO_BUILD_END the finished car drives off.
     const p = clamp(this.progress / HERO_BUILD_END);
