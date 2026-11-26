@@ -303,6 +303,12 @@ export class CarScene {
     await this.warmUp();
     if (this.disposed) return;
 
+    // A visitor who scrolled while the car was downloading (first visit, slow
+    // network) sees the car at the stage the caption already shows, instead of
+    // the build restarting from the first step and the caption jumping back.
+    if (this.getTarget) this.target = clamp(this.getTarget());
+    this.progress = this.target;
+    this.ready = true;
     this.update(true);
     this.onReady?.();
   }
@@ -598,7 +604,8 @@ export class CarScene {
       const limit = MAX_SPEED * dt;
       this.progress += Math.max(-limit, Math.min(limit, step));
     } else this.progress = this.target;
-    this.onProgress?.(this.progress);
+    // The caption follows the car only once the car is on screen.
+    if (this.ready) this.onProgress?.(this.progress);
     if (moving) this.adapt(dt);
 
     // `p` runs the build (0 → 1); after HERO_BUILD_END the finished car drives off.

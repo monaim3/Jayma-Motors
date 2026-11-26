@@ -39,6 +39,7 @@ export function HeroCar3D({ getProgress, getFreeArea, onProgress, fallbackProgre
   const getFreeAreaRef = useRef(getFreeArea);
   const onProgressRef = useRef(onProgress);
   const [ready, setReady] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [showPoster, setShowPoster] = useState(true);
   const supported = useSyncExternalStore(subscribeNoop, canRender3D, getCanRender3DOnServer);
 
@@ -71,6 +72,7 @@ export function HeroCar3D({ getProgress, getFreeArea, onProgress, fallbackProgre
       if (started) return;
       started = true;
       removeTriggers();
+      setLoading(true);
       import(/* webpackPrefetch: true */ "./car-scene").then(({ CarScene }) => {
         if (cancelled) return;
         scene = new CarScene(canvas, {
@@ -151,6 +153,25 @@ export function HeroCar3D({ getProgress, getFreeArea, onProgress, fallbackProgre
                 className="size-full object-cover"
               />
             </picture>
+          )}
+          {/*
+            First visit on a slow connection: the visitor may scroll before the car
+            has downloaded. Fades in only after a second, so a quick (cached) start
+            never flashes it.
+          */}
+          {loading && !ready && (
+            <div
+              role="status"
+              className="pointer-events-none absolute inset-x-0 bottom-[22%] flex animate-[hero-fade_400ms_ease-out_1s_both] justify-center lg:bottom-[12%] lg:left-[45%]"
+            >
+              <span className="inline-flex items-center gap-2 rounded-full bg-black/55 px-4 py-2 text-xs font-semibold text-white backdrop-blur">
+                <span
+                  aria-hidden="true"
+                  className="size-3.5 animate-spin rounded-full border-2 border-white/25 border-t-brand-500"
+                />
+                Loading 3D car…
+              </span>
+            </div>
           )}
         </>
       ) : (

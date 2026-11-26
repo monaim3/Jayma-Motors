@@ -86,11 +86,16 @@ export function ScrollBuiltHero() {
 
   // The hero tells a story from the top, so a reload starts at the floating parts
   // instead of the browser restoring the previous scroll position mid-animation.
+  // Only on a reload / back-forward: on a fresh visit over a slow connection the
+  // visitor may already be scrolling before this runs, and must not be thrown
+  // back to the top.
   useEffect(() => {
     if (!("scrollRestoration" in window.history)) return;
     const previous = window.history.scrollRestoration;
     window.history.scrollRestoration = "manual";
-    if (!window.location.hash) window.scrollTo(0, 0);
+    const navigation = performance.getEntriesByType?.("navigation")[0]?.type;
+    const restored = navigation === "reload" || navigation === "back_forward";
+    if (restored && !window.location.hash) window.scrollTo(0, 0);
     return () => {
       window.history.scrollRestoration = previous;
     };
